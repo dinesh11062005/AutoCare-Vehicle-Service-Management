@@ -1,0 +1,56 @@
+<aside class="sidebar" th:fragment="sidebar(active)">
+
+    <div class="side-brand">
+        <img src="/images/autocare-logo.png" alt="AutoCare Logo">
+        <span>Auto<span class="brand-highlight">Care</span></span>
+    </div>
+
+    <a class="side-link"
+       th:classappend="${active == 'dashboard' ? ' active' : ''}"
+       th:href="@{/customer/dashboard}">
+        Dashboard
+    </a>
+
+    <a class="side-link"
+       th:classappend="${active == 'booking' ? ' active' : ''}"
+       th:href="@{/customer/book-service}">
+        Book Service
+    </a>
+
+    <a class="side-link"
+       th:classappend="${active == 'vehicles' ? ' active' : ''}"
+       th:href="@{/customer/vehicles}">
+        My Vehicles
+    </a>
+
+    <a class="side-link"
+       th:classappend="${active == 'bookings' ? ' active' : ''}"
+       th:href="@{/customer/bookings}">
+        My Bookings
+    </a>
+
+    <a class="side-link"
+       th:classappend="${active == 'service-history' ? ' active' : ''}"
+       th:href="@{/customer/service-history}">
+        Service History
+    </a>
+
+    <a class="side-link"
+       th:classappend="${active == 'payments' ? ' active' : ''}"
+       th:href="@{/customer/payments}">
+        Payments
+    </a>
+
+    <a class="side-link"
+       th:classappend="${active == 'profile' ? ' active' : ''}"
+       th:href="@{/customer/profile}">
+        Profile
+    </a>
+
+    <div style="height: 30px;"></div>
+
+    <a class="side-link" th:href="@{/logout}">
+        Logout
+    </a>
+
+</aside>

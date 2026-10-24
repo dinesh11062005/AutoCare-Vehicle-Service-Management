@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+
+    <style>
+        /* AutoCare brand */
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .brand-logo-image {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            color: #101b2d;
+            line-height: 1;
+        }
+
+        .brand-accent {
+            color: #e5443d;
+        }
+
+        .footer-logo .brand-text {
+            color: #ffffff;
+        }
+
+        /* Hero */
+        .contact-page-hero {
+            padding: 65px 20px;
+            text-align: center;
+            background: #101b2d;
+            color: #ffffff;
+        }
+
+        .contact-page-hero h1 {
+            margin: 0 0 15px;
+            font-size: clamp(32px, 4vw, 46px);
+            font-weight: 700;
+        }
+
+        .contact-page-hero p {
+            max-width: 650px;
+            margin: 0 auto;
+            color: #d5dce6;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        /* Main content */
+        .contact-page-content {
+            padding: 65px 20px;
+            background: #f3f6fb;
+        }
+
+        .contact-intro {
+            max-width: 750px;
+            margin: 0 auto 40px;
+            text-align: center;
+        }
+
+        .contact-intro h2 {
+            margin-bottom: 12px;
+            color: #101b2d;
+            font-size: 30px;
+        }
+
+        .contact-intro p {
+            color: #647084;
+            line-height: 1.8;
+        }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 28px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: stretch;
+        }
+
+        /* Shared cards */
+        .contact-info-panel,
+        .contact-form-panel {
+            min-width: 0;
+            padding: 32px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(16, 27, 45, 0.08);
+        }
+
+        /* Contact information */
+        .contact-info-panel {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #14243b 0%, #203d60 100%);
+            border: 1px solid #263f5d;
+            color: #ffffff;
+        }
+
+        .contact-info-panel::before {
+            content: "";
+            position: absolute;
+            top: -75px;
+            right: -75px;
+            width: 190px;
+            height: 190px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .contact-info-panel::after {
+            content: "";
+            position: absolute;
+            top: -35px;
+            right: -35px;
+            width: 110px;
+            height: 110px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .contact-info-panel h3 {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 14px;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .contact-info-panel > p {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            color: #d1ddec;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* Contact information items */
+        .contact-info-item {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 15px;
+            margin-top: 27px;
+            align-items: flex-start;
+        }
+
+        .contact-info-icon {
+            position: relative;
+            display: flex;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 11px;
+            color: #ffffff;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .contact-info-item:hover .contact-info-icon {
+            background: rgba(255, 255, 255, 0.17);
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Location icon */
+        .location-icon::before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            width: 12px;
+            height: 12px;
+            box-sizing: border-box;
+            border: 2px solid currentColor;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+        }
+
+        .location-icon::after {
+            content: "";
+            position: absolute;
+            top: 17px;
+            left: 20px;
+            width: 3px;
+            height: 3px;
+            border: 1px solid currentColor;
+            border-radius: 50%;
+        }
+
+        /* Phone and email symbols */
+        .phone-icon,
+        .email-icon {
+            font-family: Arial, sans-serif;
+            font-size: 25px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        /* Working hours icon */
+        .hours-icon::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            box-sizing: border-box;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+        }
+
+        .hours-icon::after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 22px;
+            width: 6px;
+            height: 7px;
+            box-sizing: border-box;
+            border-left: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+        }
+
+        .contact-info-item h4 {
+            margin: 2px 0 7px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .contact-info-item p {
+            margin: 0;
+            color: #d1ddec;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .contact-info-item a {
+            color: #d1ddec;
+            text-decoration: none;
+        }
+
+        .contact-info-item a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .contact-info-divider {
+            position: relative;
+            z-index: 1;
+            height: 1px;
+            margin: 23px 0 0;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Contact form card */
+        .contact-form-panel {
+            background: #ffffff;
+            border: 1px solid #e5eaf2;
+        }
+
+        .contact-form-panel h3 {
+            margin: 0 0 14px;
+            color: #101b2d;
+            font-size: 23px;
+            font-weight: 700;
+        }
+
+        .contact-form-panel > p {
+            margin: 0;
+            color: #647084;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .contact-form-panel form {
+            margin-top: 25px;
+        }
+
+        /* Success and error messages */
+        .form-alert {
+            margin-top: 18px;
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .form-alert-success {
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .form-alert-error {
+            color: #991b1b;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        /* Form rows */
+        .contact-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .contact-form-group {
+            min-width: 0;
+            margin-bottom: 20px;
+        }
+
+        .contact-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #101b2d;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .contact-form-group input,
+        .contact-form-group select,
+        .contact-form-group textarea {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #dce4ef;
+            border-radius: 8px;
+            background: #f8faff;
+            color: #101b2d;
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease, background 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .contact-form-group input,
+        .contact-form-group select {
+            min-height: 46px;
+        }
+
+        .contact-form-group input::placeholder,
+        .contact-form-group textarea::placeholder {
+            color: #8995a8;
+        }
+
+        .contact-form-group input:hover,
+        .contact-form-group select:hover,
+        .contact-form-group textarea:hover {
+            border-color: #bdcadb;
+        }
+
+        .contact-form-group input:focus,
+        .contact-form-group select:focus,
+        .contact-form-group textarea:focus {
+            border-color: #e5443d;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(229, 68, 61, 0.10);
+        }
+
+        .contact-form-group textarea {
+            min-height: 130px;
+            resize: vertical;
+            line-height: 1.7;
+        }
+
+        /* Submit button */
+        .contact-submit-button {
+            display: inline-block;
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #e5443d;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .contact-submit-button:hover {
+            background: #c9342e;
+            transform: translateY(-1px);
+        }
+
+        .contact-submit-button:focus-visible {
+            outline: 3px solid rgba(229, 68, 61, 0.25);
+            outline-offset: 3px;
+        }
+
+        /* Services call to action */
+        .contact-services-cta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            max-width: 1100px;
+            margin: 35px auto 0;
+            padding: 28px 32px;
+            border: 1px solid #e1e8f2;
+            border-radius: 13px;
+            background: linear-gradient(110deg, #ffffff, #edf3fb);
+            color: #101b2d;
+        }
+
+        .contact-services-cta h3 {
+            margin: 0 0 9px;
+            color: #101b2d;
+            font-size: 21px;
+        }
+
+        .contact-services-cta p {
+            margin: 0;
+            color: #647084;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .contact-services-link {
+            display: inline-block;
+            flex-shrink: 0;
+            padding: 13px 22px;
+            border-radius: 8px;
+            background: #e5443d;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background 0.2s ease;
+        }
+
+        .contact-services-link:hover {
+            background: #c9342e;
+        }
+
+        /* Responsive design */
+        @media (max-width: 850px) {
+            .contact-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .brand-logo-image {
+                width: 35px;
+                height: 35px;
+            }
+
+            .contact-page-hero {
+                padding: 45px 18px;
+            }
+
+            .contact-page-content {
+                padding: 40px 15px;
+            }
+
+            .contact-info-panel,
+            .contact-form-panel {
+                padding: 23px 20px;
+            }
+
+            .contact-form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .contact-services-cta {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 24px 20px;
+            }
+
+            .contact-services-link {
+                width: 100%;
+                box-sizing: border-box;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="topbar">
+        <div class="nav-container">
+
+            <a class="brand"
+               th:href="@{/}"
+               href="/"
+               aria-label="AutoCare home">
+
+                <img class="brand-logo-image"
+                     th:src="@{/images/autocare-logo.png}"
+                     src="/images/autocare-logo.png"
+                     alt="AutoCare logo">
+
+                <span class="brand-text">
+                    Auto<span class="brand-accent">Care</span>
+                </span>
+            </a>
+
+            <nav class="nav" aria-label="Main navigation">
+
+                <a class="nav-link"
+                   th:href="@{/}"
+                   href="/">Home</a>
+
+                <a class="nav-link"
+                   th:href="@{/services}"
+                   href="/services">Services</a>
+
+                <a class="nav-link"
+                   th:href="@{/about}"
+                   href="/about">About Us</a>
+
+                <a class="nav-link active"
+                   th:href="@{/contact}"
+                   href="/contact"
+                   aria-current="page">Contact</a>
+
+                <div class="nav-actions">
+                    <a class="btn btn-outline"
+                       th:href="@{/login}"
+                       href="/login">Log In</a>
+
+                    <a class="btn btn-primary"
+                       th:href="@{/register}"
+                       href="/register">Get Started</a>
+                </div>
+
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contact hero -->
+    <section class="contact-page-hero">
+        <h1>Contact Us</h1>
+        <p>
+            Have a question or need help with your vehicle? Our team is here
+            to help you with your vehicle service needs.
+        </p>
+    </section>
+
+    <!-- Main contact content -->
+    <main class="contact-page-content">
+
+        <div class="contact-intro">
+            <h2>Get in Touch</h2>
+            <p>
+                Contact our team for service enquiries, appointment assistance,
+                or any questions about our vehicle service management system.
+            </p>
+        </div>
+
+        <div class="contact-layout">
+
+            <!-- Contact information -->
+            <section class="contact-info-panel">
+
+                <h3>Contact Information</h3>
+                <p>
+                    Reach out to us using the details below. We will help you
+                    find the information you need.
+                </p>
+
+                <div class="contact-info-item">
+                    <div class="contact-info-icon location-icon" aria-hidden="true"></div>
+                    <div>
+                        <h4>Our Location</h4>
+                        <p>AutoCare Vehicle Service Center</p>
+                        <p>Chennai, Tamil Nadu, India</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-divider"></div>
+
+                <div class="contact-info-item">
+                    <div class="contact-info-icon phone-icon" aria-hidden="true">☏</div>
+                    <div>
+                        <h4>Phone Number</h4>
+                        <p>Contact our service center for assistance.</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-divider"></div>
+
+                <div class="contact-info-item">
+                    <div class="contact-info-icon email-icon" aria-hidden="true">✉</div>
+                    <div>
+                        <h4>Email Support</h4>
+                        <p>Send us your enquiries using the contact form.</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-divider"></div>
+
+                <div class="contact-info-item">
+                    <div class="contact-info-icon hours-icon" aria-hidden="true"></div>
+                    <div>
+                        <h4>Working Hours</h4>
+                        <p>Monday – Saturday</p>
+                        <p>9:00 AM – 6:00 PM</p>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Contact form -->
+            <section class="contact-form-panel">
+
+                <h3>Send Us a Message</h3>
+                <p>
+                    Fill in the form below and provide details about your enquiry.
+                </p>
+
+                <div th:if="${successMessage}"
+                     class="form-alert form-alert-success"
+                     role="status"
+                     th:text="${successMessage}">
+                </div>
+
+                <div th:if="${errorMessage}"
+                     class="form-alert form-alert-error"
+                     role="alert"
+                     th:text="${errorMessage}">
+                </div>
+
+                <form th:action="@{/contact}"
+                      th:object="${contactMessage}"
+                      method="post">
+
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <div class="contact-form-row">
+
+                        <div class="contact-form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text"
+                                   id="name"
+                                   th:field="*{fullName}"
+                                   placeholder="Enter your full name"
+                                   maxlength="100"
+                                   autocomplete="name"
+                                   required>
+                        </div>
+
+                        <div class="contact-form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email"
+                                   id="email"
+                                   th:field="*{email}"
+                                   placeholder="Enter your email"
+                                   maxlength="150"
+                                   autocomplete="email"
+                                   required>
+                        </div>
+
+                    </div>
+
+                    <div class="contact-form-row">
+
+                        <div class="contact-form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel"
+                                   id="phone"
+                                   th:field="*{phoneNumber}"
+                                   placeholder="Enter your phone number"
+                                   maxlength="20"
+                                   autocomplete="tel">
+                        </div>
+
+                        <div class="contact-form-group">
+                            <label for="subject">Subject</label>
+                            <select id="subject"
+                                    th:field="*{subject}"
+                                    required>
+
+                                <option value="">Select a subject</option>
+                                <option value="General Enquiry">General Enquiry</option>
+                                <option value="Vehicle Service">Vehicle Service</option>
+                                <option value="Appointment">Appointment</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Other">Other</option>
+
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="contact-form-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message"
+                                  th:field="*{message}"
+                                  placeholder="Write your message here..."
+                                  maxlength="5000"
+                                  required></textarea>
+                    </div>
+
+                    <button type="submit" class="contact-submit-button">
+                        Send Message
+                    </button>
+
+                </form>
+
+            </section>
+        </div>
+
+        <!-- Services call to action -->
+        <section class="contact-services-cta">
+            <div>
+                <h3>Need Vehicle Service?</h3>
+                <p>
+                    Explore our available services and find the right option
+                    for your vehicle.
+                </p>
+            </div>
+
+            <a class="contact-services-link"
+               th:href="@{/services}"
+               href="/services">
+                Explore Our Services
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="footer-main">
+
+            <div class="footer-brand">
+
+                <a class="brand footer-logo"
+                   th:href="@{/}"
+                   href="/"
+                   aria-label="AutoCare home">
+
+                    <img class="brand-logo-image"
+                         th:src="@{/images/autocare-logo.png}"
+                         src="/images/autocare-logo.png"
+                         alt="AutoCare logo">
+
+                    <span class="brand-text">
+                        Auto<span class="brand-accent">Care</span>
+                    </span>
+                </a>
+
+                <p>
+                    Your trusted partner for convenient vehicle service
+                    management and maintenance.
+                </p>
+
+            </div>
+
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <a th:href="@{/}" href="/">Home</a>
+                <a th:href="@{/services}" href="/services">Services</a>
+                <a th:href="@{/about}" href="/about">About Us</a>
+                <a th:href="@{/contact}" href="/contact">Contact</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>Account</h4>
+                <a th:href="@{/login}" href="/login">Log In</a>
+                <a th:href="@{/register}" href="/register">Get Started</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>
+                &copy; 2026 AutoCare Vehicle Service Management System.
+                All rights reserved.
+            </p>
+        </div>
+
+    </footer>
+
+</body>
+</html>

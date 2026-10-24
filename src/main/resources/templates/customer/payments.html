@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Payments | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+
+        /* ==================== PAYMENTS PAGE ==================== */
+
+        .payments-container {
+
+            width: 100%;
+
+            max-width: 1500px;
+
+            margin: 0 auto;
+
+            padding: 26px 30px;
+
+        }
+
+        .payments-intro {
+
+            margin-bottom: 22px;
+
+        }
+
+        .payments-intro p {
+
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+        /* Centered search bar */
+
+        .payment-search-wrapper {
+
+            display: flex;
+
+            justify-content: center;
+
+            width: 100%;
+
+            margin: 0 auto 24px;
+
+        }
+
+        .payment-search {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            width: 100%;
+
+            max-width: 680px;
+
+            min-height: 50px;
+
+            padding: 6px 8px 6px 16px;
+
+            border: 1px solid #dbe3ed;
+
+            border-radius: 12px;
+
+            background: #ffffff;
+
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+
+            transition: border-color 0.2s, box-shadow 0.2s;
+
+        }
+
+        .payment-search:focus-within {
+
+            border-color: #e5443d;
+
+            box-shadow: 0 0 0 3px rgba(229, 68, 61, 0.09);
+
+        }
+
+        .search-icon {
+
+            display: flex;
+
+            flex-shrink: 0;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: #8492a6;
+
+        }
+
+        .search-icon svg {
+
+            width: 19px;
+
+            height: 19px;
+
+        }
+
+        .payment-search input {
+
+            flex: 1;
+
+            width: 100%;
+
+            min-width: 0;
+
+            height: 36px;
+
+            padding: 0;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            color: #172b4d;
+
+            font-family: inherit;
+
+            font-size: 13px;
+
+            box-shadow: none;
+
+        }
+
+        .payment-search input:focus {
+
+            border: none;
+
+            outline: none;
+
+            box-shadow: none;
+
+        }
+
+        .payment-search input::placeholder {
+
+            color: #94a3b8;
+
+        }
+
+        .search-clear {
+
+            display: none;
+
+            flex-shrink: 0;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 34px;
+
+            height: 34px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #f1f5f9;
+
+            color: #475569;
+
+            font-size: 19px;
+
+            cursor: pointer;
+
+        }
+
+        .search-clear:hover {
+
+            background: #e2e8f0;
+
+        }
+
+        .search-clear.visible {
+
+            display: inline-flex;
+
+        }
+
+        .payment-search-hint {
+
+            margin: -14px 0 22px;
+
+            color: #94a3b8;
+
+            font-size: 11px;
+
+            text-align: center;
+
+        }
+
+        /* Results count */
+
+        .payment-results {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-bottom: 12px;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+        }
+
+        .payment-results strong {
+
+            color: #334155;
+
+        }
+
+        /* Payment table */
+
+        .payments-card {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+            border: 1px solid #e1e6ee;
+
+            border-radius: 12px;
+
+            padding: 0;
+
+            background: #ffffff;
+
+        }
+
+        .payments-table {
+
+            width: 100%;
+
+            min-width: 850px;
+
+            border-collapse: collapse;
+
+        }
+
+        .payments-table th {
+
+            padding: 16px 14px;
+
+            background: #f6f8fb;
+
+            color: #65758b;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-align: left;
+
+            text-transform: uppercase;
+
+            white-space: nowrap;
+
+        }
+
+        .payments-table td {
+
+            padding: 17px 14px;
+
+            border-bottom: 1px solid #edf0f4;
+
+            color: #475569;
+
+            font-size: 13px;
+
+            vertical-align: middle;
+
+            white-space: nowrap;
+
+        }
+
+        .payments-table tbody tr:last-child td {
+
+            border-bottom: none;
+
+        }
+
+        .payments-table tbody tr:hover {
+
+            background: #fafbfd;
+
+        }
+
+        .payments-table tbody tr[hidden] {
+
+            display: none !important;
+
+        }
+
+        /* Payment status */
+
+        .payment-status {
+
+            display: inline-block;
+
+            padding: 7px 12px;
+
+            border-radius: 6px;
+
+            background: #e2f8ea;
+
+            color: #16803d;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+        }
+
+        .payment-status.status-pending {
+            background: #fff3cd;
+            color: #946200;
+        }
+
+        .payment-status.status-paid {
+            background: #e2f8ea;
+            color: #16803d;
+        }
+
+        .payment-status.status-failed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Invoice link */
+
+        .invoice-link {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-width: 60px;
+
+            min-height: 38px;
+
+            padding: 8px 14px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #edf2f7;
+
+            color: #0f172a;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            text-decoration: none;
+
+            transition: background 0.2s;
+
+        }
+
+        .invoice-link:hover {
+
+            background: #dfe7f0;
+
+        }
+
+        /* Empty states */
+
+        .empty {
+
+            padding: 45px 20px;
+
+            color: #718096;
+
+            text-align: center;
+
+        }
+
+        .empty h3 {
+
+            margin: 0 0 8px;
+
+            color: #172b4d;
+
+            font-size: 18px;
+
+        }
+
+        .empty p {
+
+            margin: 0 0 16px;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+        .empty a {
+
+            color: #e5443d;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            text-decoration: none;
+
+        }
+
+        .empty a:hover {
+
+            text-decoration: underline;
+
+        }
+
+        [hidden] {
+
+            display: none !important;
+
+        }
+
+        /* Responsive layout */
+
+        @media (max-width: 768px) {
+
+            .payments-container {
+
+                padding: 18px 14px;
+
+            }
+
+            .payment-search {
+
+                max-width: 100%;
+
+            }
+
+            .payments-table th,
+
+            .payments-table td {
+
+                padding: 13px 10px;
+
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            .payments-container {
+
+                padding: 14px 10px;
+
+            }
+
+            .payment-search {
+
+                min-height: 46px;
+
+            }
+
+            .payment-search-hint {
+
+                font-size: 10px;
+
+            }
+
+            .payment-results {
+
+                flex-wrap: wrap;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- Shared sidebar: keep the same sidebar used on other pages -->
+
+    <div th:replace="~{fragments/sidebar :: sidebar('payments')}"></div>
+
+    <main class="main">
+
+        <header class="page-head">
+
+            <strong>Payment History</strong>
+
+            <a class="btn btn-primary"
+
+               th:href="@{/customer/dashboard}">
+
+                Dashboard
+
+            </a>
+
+        </header>
+
+        <div class="content">
+
+            <div class="payments-container">
+
+                <div class="payments-intro">
+
+                    <p>
+
+                        View your payment records, transaction details and invoices.
+
+                    </p>
+
+                </div>
+
+                <!-- Search bar -->
+
+                <div class="payment-search-wrapper"
+
+                     th:if="${payments != null and !payments.isEmpty()}">
+
+                    <div class="payment-search">
+
+                        <span class="search-icon" aria-hidden="true">
+
+                            <svg viewBox="0 0 24 24"
+
+                                 fill="none"
+
+                                 stroke="currentColor"
+
+                                 stroke-width="2"
+
+                                 stroke-linecap="round">
+
+                                <circle cx="11" cy="11" r="7"></circle>
+
+                                <path d="m16 16 4 4"></path>
+
+                            </svg>
+
+                        </span>
+
+                        <input type="search"
+
+                               id="paymentSearchInput"
+
+                               placeholder="Search payment ID, vehicle, service, date, amount or method..."
+
+                               aria-label="Search payment history"
+
+                               autocomplete="off">
+
+                        <button type="button"
+
+                                id="clearPaymentSearch"
+
+                                class="search-clear"
+
+                                aria-label="Clear search"
+
+                                title="Clear search">
+
+                            &times;
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <p class="payment-search-hint"
+
+                   th:if="${payments != null and !payments.isEmpty()}">
+
+                    Search by payment ID, vehicle, service, amount, payment method, date or status.
+
+                </p>
+
+                <!-- Search results count -->
+
+                <div class="payment-results"
+
+                     th:if="${payments != null and !payments.isEmpty()}">
+
+                    <span>
+
+                        Payments found:
+
+                        <strong id="visiblePaymentCount"
+
+                                th:text="${payments.size()}">0</strong>
+
+                    </span>
+
+                    <span id="paymentSearchStatus" aria-live="polite"></span>
+
+                </div>
+
+                <!-- Payment history -->
+
+                <section class="payments-card">
+
+                    <table class="payments-table"
+
+                           id="paymentsTable"
+
+                           th:if="${payments != null and !payments.isEmpty()}">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Payment ID</th>
+
+                            <th>Vehicle</th>
+
+                            <th>Service</th>
+
+                            <th>Amount</th>
+
+                            <th>Method</th>
+
+                            <th>Date</th>
+
+                            <th>Status</th>
+
+                            <th>Invoice</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="paymentsTableBody">
+
+                        <tr th:each="payment : ${payments}"
+
+                            class="payment-row">
+
+                            <td th:text="${payment.id}">
+
+                                1
+
+                            </td>
+
+                            <td th:text="${payment.booking.vehicle.make + ' ' + payment.booking.vehicle.model}">
+
+                                Toyota Innova
+
+                            </td>
+
+                            <td th:text="${payment.booking.service.name}">
+
+                                General Service
+
+                            </td>
+
+                            <td th:text="${'₹' + #numbers.formatDecimal(payment.amount, 1, 2)}">
+
+                                ₹1500.00
+
+                            </td>
+
+                            <td th:text="${payment.method != null ? payment.method : 'Not specified'}">
+
+                                Cash
+
+                            </td>
+
+                            <td th:text="${payment.paidAt != null ? #temporals.format(payment.paidAt, 'dd-MM-yyyy HH:mm') : 'Not available'}">
+
+                                17-10-2026
+
+                            </td>
+
+                            <td>
+
+                                <span class="payment-status"
+
+                                      th:text="${payment.status}">
+
+                                    Paid
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <a class="invoice-link"
+
+                                   th:href="@{/customer/invoice/{id}(id=${payment.booking.id})}">
+
+                                    View
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <!-- No payment records -->
+
+                    <div class="empty"
+
+                         th:if="${payments == null or payments.isEmpty()}">
+
+                        <h3>No Payments Yet</h3>
+
+                        <p>
+
+                            Your payment records will appear here
+
+                            when payments are recorded.
+
+                        </p>
+
+                        <a th:href="@{/customer/bookings}">
+
+                            View My Bookings
+
+                        </a>
+
+                    </div>
+
+                    <!-- No matching search results -->
+
+                    <div class="empty"
+
+                         id="noPaymentSearchResults"
+
+                         hidden>
+
+                        <h3>No Matching Payments</h3>
+
+                        <p>
+
+                            No payment records match your search.
+
+                            Try a different payment ID, vehicle, service or date.
+
+                        </p>
+
+                        <a href="#"
+
+                           id="resetPaymentSearch">
+
+                            Clear search and show all payments
+
+                        </a>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput = document.getElementById("paymentSearchInput");
+
+        const clearButton = document.getElementById("clearPaymentSearch");
+
+        const resetLink = document.getElementById("resetPaymentSearch");
+
+        const tableBody = document.getElementById("paymentsTableBody");
+
+        const visibleCount = document.getElementById("visiblePaymentCount");
+
+        const searchStatus = document.getElementById("paymentSearchStatus");
+
+        const noResults = document.getElementById("noPaymentSearchResults");
+
+        const paymentsTable = document.getElementById("paymentsTable");
+
+        if (!searchInput || !tableBody) {
+
+            return;
+
+        }
+
+        const rows = Array.from(
+
+            tableBody.querySelectorAll(".payment-row")
+
+        );
+
+        function filterPayments() {
+
+            const query = searchInput.value
+
+                .trim()
+
+                .toLocaleLowerCase();
+
+            let matchCount = 0;
+
+            rows.forEach(function (row) {
+
+                const rowText = row.textContent.toLocaleLowerCase();
+
+                const matches = rowText.includes(query);
+
+                row.hidden = !matches;
+
+                if (matches) {
+
+                    matchCount++;
+
+                }
+
+            });
+
+            visibleCount.textContent = matchCount;
+
+            const hasQuery = query.length > 0;
+
+            const hasMatches = matchCount > 0;
+
+            noResults.hidden = !hasQuery || hasMatches;
+
+            paymentsTable.hidden = !hasMatches;
+
+            searchStatus.textContent = hasQuery
+
+                ? (matchCount === 1
+
+                    ? "1 matching payment"
+
+                    : matchCount + " matching payments")
+
+                : "";
+
+            clearButton.classList.toggle("visible", hasQuery);
+
+        }
+
+        searchInput.addEventListener("input", filterPayments);
+
+        clearButton.addEventListener("click", function () {
+
+            searchInput.value = "";
+
+            filterPayments();
+
+            searchInput.focus();
+
+        });
+
+        if (resetLink) {
+
+            resetLink.addEventListener("click", function (event) {
+
+                event.preventDefault();
+
+                searchInput.value = "";
+
+                filterPayments();
+
+                searchInput.focus();
+
+            });
+
+        }
+
+        filterPayments();
+
+    });
+
+</script>
+
+</body>
+
+</html>

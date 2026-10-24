@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book Service | AutoCare</title>
+    <link rel="stylesheet" href="/css/app.css">
+
+    <style>
+        .booking-columns {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            align-items: start;
+        }
+
+        .booking-column {
+            min-width: 0;
+        }
+
+        .booking-column h3 {
+            margin-top: 0;
+        }
+
+        .booking-column .form-group {
+            margin-bottom: 16px;
+        }
+
+        .service-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .service-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .service-option:hover {
+            border-color: #2563eb;
+        }
+
+        .service-option:has(input:checked) {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .service-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: #2563eb;
+        }
+
+        .service-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .service-name {
+            font-weight: 600;
+        }
+
+        .service-price {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .booking-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 16px;
+            border-radius: 8px;
+            background: #eff6ff;
+        }
+
+        .booking-total strong {
+            color: #2563eb;
+            font-size: 18px;
+        }
+		/* Server-side booking error message */
+		.booking-error {
+		    display: block;
+		    margin: 0 0 20px;
+		    padding: 14px 16px;
+		    color: #991b1b;
+		    background: #fee2e2;
+		    border: 1px solid #fca5a5;
+		    border-radius: 8px;
+		    font-weight: 600;
+		}
+
+		/* Server-side booking success message */
+		.booking-success {
+		    margin-bottom: 20px;
+		    padding: 14px 16px;
+		    border: 1px solid #bbf7d0;
+		    border-radius: 8px;
+		    background: #f0fdf4;
+		    color: #15803d;
+		    font-size: 13px;
+		    line-height: 1.6;
+		}
+
+        .form-error {
+            display: none;
+            color: #dc2626;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .booking-columns {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .service-options {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-total {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+		.booking-error {
+		    display: block;
+		    margin-bottom: 20px;
+		    padding: 14px 16px;
+		    color: #991b1b;
+		    background-color: #fee2e2;
+		    border: 1px solid #fca5a5;
+		    border-radius: 8px;
+		    font-size: 14px;
+		    line-height: 1.6;
+		    font-weight: 600;
+		}
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <div th:replace="~{fragments/sidebar :: sidebar('booking')}"></div>
+
+    <main class="main">
+
+        <header class="page-head">
+            <strong>Book Service</strong>
+        </header>
+
+		<div class="content">
+
+		    <div class="card panel">
+
+		        <div class="steps">
+
+		            <div class="step active">
+		                <span>1</span>
+		                Select Vehicle
+		            </div>
+
+		            <div class="step active">
+		                <span>2</span>
+		                Choose Service
+		            </div>
+
+		            <div class="step active">
+		                <span>3</span>
+		                Date &amp; Time
+		            </div>
+
+		            <div class="step active">
+		                <span>4</span>
+		                Confirm
+		            </div>
+
+		        </div>
+				<div th:if="${errorMessage != null}"
+				     class="booking-error"
+				     role="alert"
+				     th:text="${errorMessage}">
+				</div>
+
+                <form method="post"
+                      th:action="@{/customer/book-service}"
+                      id="bookingForm">
+
+                    <div class="booking-columns">
+
+                        <!-- Left column: Vehicle, Date, Time and Notes -->
+                        <div class="booking-column">
+
+                            <h3>Select Your Vehicle</h3>
+
+                            <div class="form-group">
+
+                                <select class="select"
+                                        id="vehicleId"
+                                        name="vehicleId"
+                                        required>
+
+                                    <option value="">Choose vehicle</option>
+
+                                    <option th:each="v : ${vehicles}"
+                                            th:value="${v.id}"
+                                            th:text="${v.make + ' ' + v.model + ' - ' + v.registrationNumber}">
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="serviceDate">Service Date</label>
+
+                                <input class="input"
+                                       type="date"
+                                       id="serviceDate"
+                                       name="serviceDate"
+                                       required>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="serviceTime">Time Slot</label>
+
+                                <select class="select"
+                                        id="serviceTime"
+                                        name="serviceTime"
+                                        required>
+
+                                    <option value="09:00">09:00</option>
+                                    <option value="10:00">10:00</option>
+                                    <option value="11:00">11:00</option>
+                                    <option value="12:00">12:00</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="15:00">15:00</option>
+                                    <option value="16:00">16:00</option>
+                                    <option value="17:00">17:00</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="notes">Additional Notes</label>
+
+                                <textarea class="textarea"
+                                          id="notes"
+                                          name="notes"
+                                          rows="5"
+                                          maxlength="1000"
+                                          placeholder="Any special instructions..."></textarea>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Right column: Multiple Service Selection -->
+                        <div class="booking-column">
+
+                            <h3>Select Service Type</h3>
+
+                            <div class="service-options">
+
+                                <label class="service-option"
+                                       th:each="s : ${services}">
+
+                                    <input type="checkbox"
+                                           name="serviceIds"
+                                           th:value="${s.id}"
+                                           th:attr="data-price=${s.basePrice}"
+                                           class="service-checkbox">
+
+                                    <span class="service-info">
+
+                                        <span class="service-name"
+                                              th:text="${s.name}">
+                                        </span>
+
+                                        <span class="service-price"
+                                              th:text="${'₹' + #numbers.formatDecimal(s.basePrice, 1, 2)}">
+                                        </span>
+
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                            <p id="serviceError"
+                               class="form-error"
+                               role="alert">
+                                Please select at least one service.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Selected Services and Total -->
+                    <div class="booking-total">
+
+                        <div>
+                            <span>Selected Services: </span>
+                            <strong id="serviceCount">0</strong>
+                        </div>
+
+                        <div>
+                            <span>Total Amount: </span>
+                            <strong id="bookingTotal">₹0.00</strong>
+                        </div>
+
+                    </div>
+
+                    <!-- Date Validation Message -->
+                    <p id="dateError"
+                       class="form-error"
+                       role="alert">
+                        Please select today or a future date.
+                    </p>
+
+                    <!-- Submit Booking -->
+                    <button type="submit"
+                            class="btn btn-primary"
+                            id="submitButton">
+                        Confirm Booking
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("bookingForm");
+        const checkboxes = document.querySelectorAll(".service-checkbox");
+
+        const totalElement = document.getElementById("bookingTotal");
+        const countElement = document.getElementById("serviceCount");
+
+        const serviceError = document.getElementById("serviceError");
+        const dateError = document.getElementById("dateError");
+
+        const dateInput = document.getElementById("serviceDate");
+        const submitButton = document.getElementById("submitButton");
+
+        // Set today's date as the minimum selectable date.
+        const today = new Date();
+
+        const localDate = new Date(
+            today.getTime() - today.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+
+        dateInput.min = localDate;
+
+        // Calculate the selected service count and total.
+        function updateTotal() {
+
+            let total = 0;
+            let count = 0;
+
+            checkboxes.forEach(function (checkbox) {
+
+                if (checkbox.checked) {
+                    total += Number(checkbox.dataset.price || 0);
+                    count++;
+                }
+
+            });
+
+            totalElement.textContent = "₹" + total.toFixed(2);
+            countElement.textContent = count;
+
+        }
+
+        // Update the total when a service is selected or deselected.
+        checkboxes.forEach(function (checkbox) {
+
+            checkbox.addEventListener("change", function () {
+
+                updateTotal();
+
+                if (document.querySelector(".service-checkbox:checked")) {
+                    serviceError.style.display = "none";
+                }
+
+            });
+
+        });
+
+        // Validate the form before submission.
+        form.addEventListener("submit", function (event) {
+
+            const selectedServices = document.querySelectorAll(
+                ".service-checkbox:checked"
+            );
+
+            serviceError.style.display = "none";
+            dateError.style.display = "none";
+
+            if (selectedServices.length === 0) {
+
+                event.preventDefault();
+                serviceError.style.display = "block";
+
+                return;
+
+            }
+
+            if (!dateInput.value || dateInput.value < localDate) {
+
+                event.preventDefault();
+                dateError.style.display = "block";
+
+                return;
+
+            }
+
+            if (!form.checkValidity()) {
+
+                event.preventDefault();
+                form.reportValidity();
+
+                return;
+
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Processing...";
+
+        });
+
+        updateTotal();
+
+    });
+</script>
+
+</body>
+</html>

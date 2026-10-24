@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Vehicles | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        .vehicle-page {
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        .vehicle-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .vehicle-heading h2 {
+            margin: 0 0 8px;
+        }
+
+        .vehicle-heading p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .vehicle-total {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #64748b;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .vehicle-total strong {
+            font-size: 22px;
+            color: #0f172a;
+            margin-right: 6px;
+        }
+
+        .vehicle-panel {
+            min-width: 0;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .vehicle-panel-header {
+            margin-bottom: 18px;
+        }
+
+        .vehicle-panel-header h3 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .vehicle-panel-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .vehicle-search-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .vehicle-search {
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+            height: 46px;
+            box-sizing: border-box;
+            padding: 0 15px;
+            border: 1px solid #dbe3ee;
+            border-radius: 9px;
+            outline: none;
+            background: #fff;
+            color: #0f172a;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .vehicle-search:focus {
+            border-color: #64748b;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.10);
+        }
+
+        .vehicle-clear {
+            height: 46px;
+            min-width: 76px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 9px;
+            background: #edf2f8;
+            color: #0f172a;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .vehicle-clear:hover {
+            background: #e2e8f0;
+        }
+
+        .vehicle-results {
+            margin-bottom: 14px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .vehicle-table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e8edf4;
+            border-radius: 9px;
+        }
+
+        .vehicle-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vehicle-table th,
+        .vehicle-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e8edf4;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 12px;
+        }
+
+        .vehicle-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: 0.035em;
+            white-space: nowrap;
+        }
+
+        .vehicle-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .vehicle-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .vehicle-id {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .vehicle-identity {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-width: 175px;
+        }
+
+        .vehicle-avatar {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 50%;
+            border: 1px solid #dce4ef;
+            background: #e8eef7;
+            color: #10223d;
+            font-size: 19px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        button.vehicle-avatar {
+            padding: 0;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .vehicle-avatar img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .vehicle-avatar:hover {
+            border-color: #94a3b8;
+        }
+
+        .vehicle-name {
+            font-weight: 700;
+            color: #10223d;
+        }
+
+        .vehicle-registration {
+            white-space: nowrap;
+        }
+
+        .vehicle-customer {
+            font-weight: 600;
+        }
+
+        .vehicle-email {
+            overflow-wrap: anywhere;
+        }
+
+        .vehicle-empty {
+            display: none;
+            padding: 35px 15px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .vehicle-empty h3 {
+            margin: 0 0 8px;
+            color: #10223d;
+        }
+
+        .vehicle-empty p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        /* Enlarged vehicle photo viewer */
+
+        .vehicle-photo-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: rgba(8, 15, 28, 0.82);
+        }
+
+        .vehicle-photo-modal.open {
+            display: flex;
+        }
+
+        .vehicle-photo-dialog {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            padding: 24px;
+            box-sizing: border-box;
+            border-radius: 16px;
+            background: #fff;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+        }
+
+        .vehicle-photo-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #edf2f8;
+            color: #0f172a;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .vehicle-photo-large {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 340px;
+            margin: 12px auto 18px;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #f1f5f9;
+        }
+
+        .vehicle-photo-large img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .vehicle-photo-initial {
+            color: #10223d;
+            font-size: 100px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .vehicle-photo-name {
+            margin: 0 0 6px;
+            color: #10223d;
+            font-size: 20px;
+        }
+
+        .vehicle-photo-registration {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        body.vehicle-modal-open {
+            overflow: hidden;
+        }
+
+        @media (max-width: 800px) {
+            .vehicle-panel {
+                padding: 16px;
+            }
+
+            .vehicle-heading h2 {
+                font-size: 22px;
+            }
+
+            .vehicle-search-row {
+                align-items: stretch;
+            }
+
+            .vehicle-clear {
+                min-width: 65px;
+                padding: 0 12px;
+            }
+
+            .vehicle-photo-large {
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .vehicle-search-row {
+                flex-direction: column;
+            }
+
+            .vehicle-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="side-brand">
+            <img th:src="@{/images/autocare-logo.png}" alt="AutoCare Logo">
+            <span class="brand-name">Auto<span class="brand-highlight">Care</span></span>
+        </div>
+
+        <a class="side-link" th:href="@{/admin/dashboard}">Dashboard</a>
+        <a class="side-link" th:href="@{/admin/service-requests}">Service Requests</a>
+        <a class="side-link" th:href="@{/admin/work-in-progress}">Work in Progress</a>
+        <a class="side-link" th:href="@{/admin/completed}">Completed</a>
+        <a class="side-link" th:href="@{/admin/customers}">Customers</a>
+        <a class="side-link active" th:href="@{/admin/vehicles}">Vehicles</a>
+        <a class="side-link" th:href="@{/admin/payments}">Payments</a>
+        <a class="side-link" th:href="@{/admin/reports}">Reports</a>
+        <a class="side-link" th:href="@{/}">Home</a>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <header class="page-head">
+            <strong>Vehicles</strong>
+            <span>Service Manager</span>
+        </header>
+
+        <div class="content vehicle-page">
+
+            <!-- Page Heading -->
+            <section class="vehicle-heading">
+
+                <div>
+                    <h2>Vehicle Management</h2>
+                    <p>View registered vehicles, vehicle photos and customer information.</p>
+                </div>
+
+                <div class="vehicle-total">
+                    <strong th:text="${#lists.size(vehicles)}">0</strong>
+                    Registered Vehicles
+                </div>
+
+            </section>
+
+            <!-- Vehicles Table -->
+            <section class="card vehicle-panel">
+
+                <div class="vehicle-panel-header">
+                    <h3>
+                        Registered Vehicles
+                        (<span th:text="${#lists.size(vehicles)}">0</span>)
+                    </h3>
+
+                    <p>Search vehicle details and click a vehicle photo to enlarge it.</p>
+                </div>
+
+                <!-- Search -->
+                <div class="vehicle-search-row">
+
+                    <input
+                        type="search"
+                        id="vehicleSearch"
+                        class="vehicle-search"
+                        placeholder="Search by vehicle ID, make, model, registration or customer..."
+                        aria-label="Search vehicles">
+
+                    <button type="button" id="vehicleClear" class="vehicle-clear">
+                        Clear
+                    </button>
+
+                </div>
+
+                <div class="vehicle-results" id="vehicleResults" aria-live="polite">
+                    Showing vehicles
+                </div>
+
+                <div class="vehicle-table-scroll" id="vehicleTableScroll">
+
+                    <table class="vehicle-table">
+
+                        <thead>
+                            <tr>
+                                <th>Vehicle ID</th>
+                                <th>Vehicle</th>
+                                <th>Registration Number</th>
+                                <th>Type</th>
+                                <th>Year</th>
+                                <th>Mileage</th>
+                                <th>Customer</th>
+                                <th>Customer Email</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="vehicleTableBody">
+
+                            <tr
+                                th:each="vehicle : ${vehicles}"
+                                class="vehicle-row"
+                                th:attr="data-search=${vehicle.id + ' ' + vehicle.make + ' ' + vehicle.model + ' ' + vehicle.registrationNumber + ' ' + (vehicle.vehicleType != null ? vehicle.vehicleType : '') + ' ' + (vehicle.year != null ? vehicle.year : '') + ' ' + (vehicle.customer != null ? vehicle.customer.name : '') + ' ' + (vehicle.customer != null ? vehicle.customer.email : '')}">
+
+                                <td class="vehicle-id" th:text="${vehicle.id}">1</td>
+
+                                <td>
+                                    <div class="vehicle-identity">
+
+                                        <!-- Vehicle photo or fallback initial -->
+                                        <button
+                                            type="button"
+                                            class="vehicle-avatar vehicle-photo-trigger"
+                                            th:attr="
+                                                data-photo=${vehicle.image != null and !#strings.isEmpty(vehicle.image) ? '/uploads/vehicles/' + vehicle.image : ''},
+                                                data-name=${vehicle.make + ' ' + vehicle.model},
+                                                data-registration=${vehicle.registrationNumber},
+                                                data-initial=${#strings.isEmpty(vehicle.make) ? 'V' : #strings.substring(vehicle.make, 0, 1)}"
+                                            th:aria-label="${'View photo of ' + vehicle.make + ' ' + vehicle.model}">
+
+                                            <span
+                                                class="vehicle-initial"
+                                                th:text="${#strings.isEmpty(vehicle.make) ? 'V' : #strings.substring(vehicle.make, 0, 1)}">V</span>
+
+                                        </button>
+
+                                        <div>
+                                            <div
+                                                class="vehicle-name"
+                                                th:text="${vehicle.make + ' ' + vehicle.model}">
+                                                Toyota Creta
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+
+                                <td
+                                    class="vehicle-registration"
+                                    th:text="${vehicle.registrationNumber}">
+                                    TN01AB1234
+                                </td>
+
+                                <td th:text="${vehicle.vehicleType != null and !#strings.isEmpty(vehicle.vehicleType) ? vehicle.vehicleType : 'Not provided'}">
+                                    Car
+                                </td>
+
+                                <td th:text="${vehicle.year != null ? vehicle.year : 'Not provided'}">
+                                    2024
+                                </td>
+
+                                <td th:text="${vehicle.mileage != null ? #numbers.formatInteger(vehicle.mileage, 1, 'COMMA') + ' km' : 'Not provided'}">
+                                    18,000 km
+                                </td>
+
+                                <td
+                                    class="vehicle-customer"
+                                    th:text="${vehicle.customer != null ? vehicle.customer.name : 'Not provided'}">
+                                    Customer
+                                </td>
+
+                                <td
+                                    class="vehicle-email"
+                                    th:text="${vehicle.customer != null ? vehicle.customer.email : 'Not provided'}">
+                                    customer@example.com
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- No search matches -->
+                <div class="vehicle-empty" id="vehicleNoResults">
+                    <h3>No Matching Vehicles</h3>
+                    <p>Try another vehicle ID, model, registration number or customer name.</p>
+                </div>
+
+                <!-- No vehicles registered -->
+                <div
+                    th:if="${#lists.isEmpty(vehicles)}"
+                    class="vehicle-empty"
+                    style="display: block">
+
+                    <h3>No Vehicles Registered</h3>
+                    <p>Vehicles registered by customers will appear here.</p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Enlarged Photo Modal -->
+<div
+    class="vehicle-photo-modal"
+    id="vehiclePhotoModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vehiclePhotoName"
+    aria-hidden="true">
+
+    <div class="vehicle-photo-dialog">
+
+        <button
+            type="button"
+            class="vehicle-photo-close"
+            id="vehiclePhotoClose"
+            aria-label="Close photo viewer">
+            &times;
+        </button>
+
+        <div class="vehicle-photo-large" id="vehiclePhotoLarge">
+            <span class="vehicle-photo-initial" id="vehiclePhotoInitial">V</span>
+        </div>
+
+        <h3 class="vehicle-photo-name" id="vehiclePhotoName">Vehicle</h3>
+
+        <p class="vehicle-photo-registration" id="vehiclePhotoRegistration"></p>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* Vehicle search */
+        const searchInput = document.getElementById("vehicleSearch");
+        const clearButton = document.getElementById("vehicleClear");
+        const vehicleRows = Array.from(document.querySelectorAll(".vehicle-row"));
+        const resultsText = document.getElementById("vehicleResults");
+        const noResults = document.getElementById("vehicleNoResults");
+        const tableScroll = document.getElementById("vehicleTableScroll");
+
+        function filterVehicles() {
+            const query = searchInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            vehicleRows.forEach(function (row) {
+                const searchableText = (row.dataset.search || "").toLowerCase();
+                const matches = searchableText.includes(query);
+
+                row.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            resultsText.textContent =
+                "Showing " + visibleCount + " of " + vehicleRows.length + " vehicles";
+
+            noResults.style.display =
+                vehicleRows.length > 0 && visibleCount === 0 ? "block" : "none";
+
+            tableScroll.style.display =
+                vehicleRows.length > 0 && visibleCount > 0 ? "block" : "none";
+        }
+
+        searchInput.addEventListener("input", filterVehicles);
+
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            filterVehicles();
+            searchInput.focus();
+        });
+
+        filterVehicles();
+
+        /* Vehicle photos and fallback initials */
+        const modal = document.getElementById("vehiclePhotoModal");
+        const closeButton = document.getElementById("vehiclePhotoClose");
+        const largePhotoContainer = document.getElementById("vehiclePhotoLarge");
+        const photoName = document.getElementById("vehiclePhotoName");
+        const photoRegistration = document.getElementById("vehiclePhotoRegistration");
+
+        let previousFocus = null;
+
+        function getInitial(name) {
+            const cleanName = (name || "Vehicle").trim();
+            return cleanName ? cleanName.charAt(0).toUpperCase() : "V";
+        }
+
+        function showInitial(container, initial) {
+            container.replaceChildren();
+
+            const letter = document.createElement("span");
+            letter.className = "vehicle-photo-initial";
+            letter.textContent = initial;
+
+            container.appendChild(letter);
+        }
+
+        function setAvatarFallback(button) {
+            const initial = button.dataset.initial || "V";
+
+            button.replaceChildren();
+
+            const letter = document.createElement("span");
+            letter.className = "vehicle-initial";
+            letter.textContent = initial;
+
+            button.appendChild(letter);
+        }
+
+        function setAvatarImage(button, photo) {
+            if (!photo) {
+                setAvatarFallback(button);
+                return;
+            }
+
+            const image = document.createElement("img");
+            image.alt = "";
+            image.loading = "lazy";
+
+            image.addEventListener("error", function () {
+                console.error("Vehicle image failed to load:", photo);
+                setAvatarFallback(button);
+            });
+
+            image.src = photo;
+            button.replaceChildren(image);
+        }
+
+        document.querySelectorAll(".vehicle-photo-trigger").forEach(function (button) {
+            const photo = (button.dataset.photo || "").trim();
+
+            if (photo) {
+                setAvatarImage(button, photo);
+            } else {
+                setAvatarFallback(button);
+            }
+
+            button.addEventListener("click", function () {
+                openPhotoViewer(button);
+            });
+        });
+
+        function openPhotoViewer(button) {
+            previousFocus = document.activeElement;
+
+            const name = button.dataset.name || "Vehicle";
+            const registration = button.dataset.registration || "";
+            const photo = (button.dataset.photo || "").trim();
+            const initial = button.dataset.initial || getInitial(name);
+
+            photoName.textContent = name;
+
+            photoRegistration.textContent = registration
+                ? "Registration: " + registration
+                : "";
+
+            showInitial(largePhotoContainer, initial);
+
+            if (photo) {
+                const image = document.createElement("img");
+                image.alt = name + " photo";
+
+                image.addEventListener("error", function () {
+                    showInitial(largePhotoContainer, initial);
+                });
+
+                image.src = photo;
+                largePhotoContainer.replaceChildren(image);
+            }
+
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("vehicle-modal-open");
+
+            closeButton.focus();
+        }
+
+        function closePhotoViewer() {
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("vehicle-modal-open");
+
+            if (previousFocus) {
+                previousFocus.focus();
+            }
+        }
+
+        closeButton.addEventListener("click", closePhotoViewer);
+
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                closePhotoViewer();
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && modal.classList.contains("open")) {
+                closePhotoViewer();
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

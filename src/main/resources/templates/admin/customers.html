@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Customers | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        .customers-content {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 26px;
+            box-sizing: border-box;
+            min-width: 0;
+        }
+
+        .customers-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .customers-heading h1 {
+            margin: 0 0 8px;
+            color: #0f1d32;
+            font-size: 26px;
+        }
+
+        .customers-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .customer-count-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .customer-count-number {
+            color: #0f1d32;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .customer-count-label {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .customers-panel {
+            min-width: 0;
+            padding: 24px;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        .customers-panel-header {
+            margin-bottom: 20px;
+        }
+
+        .customers-panel-header h2 {
+            margin: 0 0 7px;
+            color: #0f1d32;
+            font-size: 20px;
+        }
+
+        .customers-panel-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* Search bar */
+
+        .customer-search-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .customer-search-input {
+            flex: 1;
+            min-width: 0;
+            height: 46px;
+            padding: 0 15px;
+            border: 1px solid #dbe3ee;
+            border-radius: 9px;
+            background: #fff;
+            color: #0f172a;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .customer-search-input:focus {
+            border-color: #e9423a;
+            box-shadow: 0 0 0 3px rgba(233, 66, 58, 0.1);
+        }
+
+        .customer-search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .customer-clear-button {
+            min-width: 76px;
+            height: 46px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 9px;
+            background: #edf2f8;
+            color: #0f1d32;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .customer-clear-button:hover {
+            background: #e2e8f0;
+        }
+
+        .customer-results-count {
+            margin: 0 0 14px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* Customer table */
+
+        .customers-table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #edf0f5;
+            border-radius: 9px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .customers-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .customers-table th {
+            padding: 15px 13px;
+            background: #f8fafc;
+            color: #64748b;
+            text-align: left;
+            white-space: nowrap;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.035em;
+            border-bottom: 1px solid #e5eaf1;
+        }
+
+        .customers-table td {
+            padding: 14px 13px;
+            color: #475569;
+            font-size: 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .customers-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .customers-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .customer-id {
+            color: #0f1d32 !important;
+            font-weight: 700;
+        }
+
+        .customer-email {
+            overflow-wrap: anywhere;
+        }
+
+        .customer-address {
+            min-width: 150px;
+            max-width: 260px;
+            white-space: normal;
+            line-height: 1.6;
+        }
+
+        /* Customer profile photo */
+
+        .customer-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 175px;
+        }
+
+        .customer-avatar {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 46px;
+            width: 46px;
+            height: 46px;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid #dbe3ee;
+            border-radius: 50%;
+            background: #e8edf5;
+            color: #0f1d32;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .customer-avatar:hover {
+            border-color: #e9423a;
+        }
+
+        .customer-avatar-image {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .customer-initial {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #e8edf5;
+            color: #0f1d32;
+            font-size: 19px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .customer-name {
+            color: #0f1d32;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .customer-vehicle-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: 6px;
+            background: #edf2f8;
+            color: #0f1d32;
+            font-size: 12px;
+            font-weight: 800;
+            box-sizing: border-box;
+        }
+
+        /* Empty state */
+
+        .customers-empty {
+            padding: 42px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .customers-empty h3 {
+            margin: 0 0 8px;
+            color: #0f1d32;
+            font-size: 17px;
+        }
+
+        .customers-empty p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        /* Enlarged profile photo viewer */
+
+        .profile-photo-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(5, 12, 23, 0.88);
+            box-sizing: border-box;
+        }
+
+        .profile-photo-modal.open {
+            display: flex;
+        }
+
+        .profile-photo-dialog {
+            position: relative;
+            width: min(420px, 100%);
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            background: #fff;
+            text-align: center;
+            box-sizing: border-box;
+            animation: profileModalIn 0.18s ease-out;
+        }
+
+        .profile-photo-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 50%;
+            background: #edf2f8;
+            color: #0f1d32;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .profile-photo-close:hover {
+            background: #e2e8f0;
+        }
+
+        .profile-photo-large {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: min(280px, 100%);
+            height: 280px;
+            margin: 20px auto 18px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            background: #e8edf5;
+            color: #0f1d32;
+            font-size: 100px;
+            font-weight: 800;
+            text-transform: uppercase;
+            box-sizing: border-box;
+        }
+
+        .profile-photo-large img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-photo-name {
+            margin: 0;
+            color: #0f1d32;
+            font-size: 19px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-photo-email {
+            margin: 8px 0 0;
+            color: #64748b;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        body.profile-modal-open {
+            overflow: hidden;
+        }
+
+        @keyframes profileModalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+
+        @media (max-width: 800px) {
+            .customers-content {
+                padding: 16px;
+            }
+
+            .customers-panel {
+                padding: 16px;
+            }
+
+            .customers-heading h1 {
+                font-size: 22px;
+            }
+
+            .customer-search-row {
+                gap: 8px;
+            }
+
+            .customer-clear-button {
+                min-width: 62px;
+                padding: 0 12px;
+            }
+
+            .profile-photo-large {
+                width: 220px;
+                height: 220px;
+                font-size: 80px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .customer-search-row {
+                flex-direction: column;
+            }
+
+            .customer-clear-button {
+                width: 100%;
+            }
+
+            .profile-photo-dialog {
+                padding: 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .profile-photo-dialog {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+
+        <div class="side-brand">
+            <img th:src="@{/images/autocare-logo.png}" alt="AutoCare Logo">
+            <span class="brand-name">Auto<span class="brand-highlight">Care</span></span>
+        </div>
+
+        <a class="side-link" th:href="@{/admin/dashboard}">Dashboard</a>
+        <a class="side-link" th:href="@{/admin/service-requests}">Service Requests</a>
+        <a class="side-link" th:href="@{/admin/work-in-progress}">Work in Progress</a>
+        <a class="side-link" th:href="@{/admin/completed}">Completed</a>
+        <a class="side-link active" th:href="@{/admin/customers}">Customers</a>
+        <a class="side-link" th:href="@{/admin/vehicles}">Vehicles</a>
+        <a class="side-link" th:href="@{/admin/payments}">Payments</a>
+        <a class="side-link" th:href="@{/admin/reports}">Reports</a>
+        <a class="side-link" th:href="@{/}">Home</a>
+
+    </aside>
+
+    <main class="main">
+
+        <header class="page-head">
+            <strong>Customers</strong>
+            <span>Service Manager</span>
+        </header>
+
+        <div class="customers-content">
+
+            <section class="customers-heading">
+                <div>
+                    <h1>Customer Management</h1>
+                    <p>View registered customers, contact details and profile photos.</p>
+                </div>
+
+                <div class="customer-count-card">
+                    <span class="customer-count-number"
+                          th:text="${#lists.size(customers)}">0</span>
+
+                    <span class="customer-count-label">Registered Customers</span>
+                </div>
+            </section>
+
+            <section class="card customers-panel">
+
+                <div class="customers-panel-header">
+                    <div>
+                        <h2>
+                            Registered Customers
+                            (<span id="customerTotal"
+                                   th:text="${#lists.size(customers)}">0</span>)
+                        </h2>
+
+                        <p>Search customer details and click a profile photo to enlarge it.</p>
+                    </div>
+                </div>
+
+                <div class="customer-search-row">
+
+                    <input
+                        type="search"
+                        id="customerSearch"
+                        class="customer-search-input"
+                        placeholder="Search by ID, name, email, phone or address..."
+                        aria-label="Search registered customers"
+                        autocomplete="off">
+
+                    <button
+                        type="button"
+                        id="clearCustomerSearch"
+                        class="customer-clear-button">
+                        Clear
+                    </button>
+
+                </div>
+
+                <p class="customer-results-count" id="customerResultsCount" aria-live="polite">
+                    Showing customers
+                </p>
+
+                <div class="customers-table-scroll"
+                     th:if="${not #lists.isEmpty(customers)}">
+
+                    <table class="customers-table" id="customersTable">
+
+                        <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Vehicles</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="customersTableBody">
+
+                        <tr th:each="customer : ${customers}"
+                            class="customer-row">
+
+                            <td class="customer-id"
+                                th:text="${customer.id}">1</td>
+
+								<!-- Customer Profile Photo -->
+								<td>
+								    <div class="customer-profile">
+
+								        <button
+								            type="button"
+								            class="customer-avatar profile-photo-trigger"
+								            th:attr="data-customer-name=${customer.name != null ? customer.name : 'Customer'},
+								                     data-photo=${customer.profilePhoto != null and !#strings.isEmpty(customer.profilePhoto) ? '/admin/customer-photo/' + customer.id : ''},
+								                     data-customer-email=${customer.email != null ? customer.email : ''}">
+
+								            <!-- Show the actual uploaded profile photo -->
+								            <img
+								                th:if="${customer.profilePhoto != null and !#strings.isEmpty(customer.profilePhoto)}"
+								                th:src="@{/admin/customer-photo/{id}(id=${customer.id})}"
+								                th:alt="${customer.name}"
+								                class="customer-avatar-image"
+								                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+
+								            <!-- Show the first letter if no photo exists -->
+								            <span
+								                class="customer-initial"
+								                th:style="${customer.profilePhoto != null and !#strings.isEmpty(customer.profilePhoto) ? 'display:none' : 'display:flex'}"
+								                th:text="${customer.name != null and !#strings.isEmpty(customer.name) ? #strings.toUpperCase(#strings.substring(customer.name, 0, 1)) : 'C'}">
+								                D
+								            </span>
+
+								        </button>
+
+								        <strong
+								            class="customer-name"
+								            th:text="${customer.name != null ? customer.name : 'Customer'}">
+								            Customer Name
+								        </strong>
+
+								    </div>
+								</td>
+
+                            <td class="customer-email"
+                                th:text="${customer.email != null and !#strings.isEmpty(customer.email) ? customer.email : 'Not provided'}">
+                                customer@example.com
+                            </td>
+
+                            <td class="customer-phone"
+                                th:text="${customer.phone != null and !#strings.isEmpty(customer.phone) ? customer.phone : 'Not provided'}">
+                                Not provided
+                            </td>
+
+                            <td class="customer-address"
+                                th:text="${customer.address != null and !#strings.isEmpty(customer.address) ? customer.address : 'Not provided'}">
+                                Not provided
+                            </td>
+
+                            <td>
+                                <span class="customer-vehicle-count"
+                                      th:text="${customer.vehicles != null ? #lists.size(customer.vehicles) : 0}">
+                                    0
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="customers-empty"
+                     id="noSearchResults"
+                     style="display: none;">
+                    <h3>No Matching Customers</h3>
+                    <p>Try searching with another name, email, phone number or customer ID.</p>
+                </div>
+
+                <div class="customers-empty"
+                     th:if="${#lists.isEmpty(customers)}">
+                    <h3>No Customers Registered</h3>
+                    <p>Registered customers will appear here when they create an account.</p>
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Enlarged Profile Photo Viewer -->
+
+<div
+    class="profile-photo-modal"
+    id="profilePhotoModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="profilePhotoName"
+    aria-hidden="true">
+
+    <div class="profile-photo-dialog">
+
+        <button
+            type="button"
+            class="profile-photo-close"
+            id="closeProfilePhoto"
+            aria-label="Close profile photo">
+            &times;
+        </button>
+
+        <div class="profile-photo-large" id="profilePhotoLarge">
+            <span id="profilePhotoInitial">D</span>
+        </div>
+
+        <h2 class="profile-photo-name" id="profilePhotoName">
+            Customer Name
+        </h2>
+
+        <p class="profile-photo-email" id="profilePhotoEmail"></p>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* Customer search */
+
+        const searchInput = document.getElementById("customerSearch");
+        const clearButton = document.getElementById("clearCustomerSearch");
+        const tableBody = document.getElementById("customersTableBody");
+        const resultsCount = document.getElementById("customerResultsCount");
+        const noSearchResults = document.getElementById("noSearchResults");
+        const customerTotal = document.getElementById("customerTotal");
+
+        function filterCustomers() {
+            if (!tableBody) {
+                resultsCount.textContent = "No customers to display.";
+                return;
+            }
+
+            const query = searchInput.value.trim().toLowerCase();
+            const rows = Array.from(tableBody.querySelectorAll(".customer-row"));
+
+            let visibleCount = 0;
+
+            rows.forEach(function (row) {
+                const matches = row.textContent.toLowerCase().includes(query);
+
+                row.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            resultsCount.textContent =
+                "Showing " + visibleCount + " of " + rows.length + " customers";
+
+            customerTotal.textContent = rows.length;
+
+            if (noSearchResults) {
+                noSearchResults.style.display =
+                    rows.length > 0 && visibleCount === 0 ? "block" : "none";
+            }
+
+            const tableScroll = document.querySelector(".customers-table-scroll");
+
+            if (tableScroll) {
+                tableScroll.style.display =
+                    visibleCount === 0 && rows.length > 0 ? "none" : "block";
+            }
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener("input", filterCustomers);
+        }
+
+        if (clearButton && searchInput) {
+            clearButton.addEventListener("click", function () {
+                searchInput.value = "";
+                filterCustomers();
+                searchInput.focus();
+            });
+        }
+
+        filterCustomers();
+
+        /* Profile photo viewer */
+
+        const modal = document.getElementById("profilePhotoModal");
+        const closeButton = document.getElementById("closeProfilePhoto");
+        const largePhotoContainer = document.getElementById("profilePhotoLarge");
+        const photoName = document.getElementById("profilePhotoName");
+        const photoEmail = document.getElementById("profilePhotoEmail");
+        const photoInitial = document.getElementById("profilePhotoInitial");
+
+        let previousFocus = null;
+
+        function getInitial(name) {
+            const trimmedName = (name || "Customer").trim();
+
+            return trimmedName.length > 0
+                ? trimmedName.charAt(0).toUpperCase()
+                : "C";
+        }
+
+        function showInitial(initial) {
+            largePhotoContainer.replaceChildren();
+            photoInitial.textContent = initial;
+            largePhotoContainer.appendChild(photoInitial);
+        }
+
+        function openProfilePhoto(button) {
+            previousFocus = document.activeElement;
+
+            const name = button.dataset.customerName || "Customer";
+            const email = button.dataset.customerEmail || "";
+            const photo = button.dataset.photo || "";
+            const initial = getInitial(name);
+
+            photoName.textContent = name;
+            photoEmail.textContent = email;
+
+            showInitial(initial);
+
+            if (photo) {
+                const image = document.createElement("img");
+                image.alt = name + " profile photo";
+
+                image.onload = function () {
+                    largePhotoContainer.replaceChildren(image);
+                };
+
+                image.onerror = function () {
+                    showInitial(initial);
+                };
+
+                image.src = photo;
+            }
+
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("profile-modal-open");
+            closeButton.focus();
+        }
+
+        function closeProfilePhoto() {
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("profile-modal-open");
+
+            if (previousFocus) {
+                previousFocus.focus();
+            }
+        }
+
+        document.querySelectorAll(".profile-photo-trigger").forEach(function (button) {
+            button.addEventListener("click", function () {
+                openProfilePhoto(button);
+            });
+        });
+
+        closeButton.addEventListener("click", closeProfilePhoto);
+
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                closeProfilePhoto();
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && modal.classList.contains("open")) {
+                closeProfilePhoto();
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

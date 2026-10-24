@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dashboard | AutoCare</title>
+	<link rel="stylesheet" href="/css/app.css">
+	<style>
+		.upcoming-service-list {
+			display: flex;
+			flex-direction: column;
+			gap: 0;
+		}
+
+		.upcoming-service-item {
+			display: flex;
+			justify-content: space-between;
+			gap: 15px;
+			align-items: center;
+			border-bottom: 1px solid #edf0f5;
+			padding: 13px 0;
+		}
+
+		.upcoming-service-item:last-child {
+			border-bottom: none;
+		}
+
+		.upcoming-service-details {
+			min-width: 0;
+			flex: 1;
+		}
+
+		.upcoming-service-details b {
+			display: block;
+			margin-bottom: 4px;
+		}
+
+		.upcoming-service-names {
+			font-size: 12px;
+			color: #718096;
+			line-height: 1.7;
+			overflow-wrap: anywhere;
+		}
+
+		.upcoming-service-status {
+			flex-shrink: 0;
+		}
+
+		.empty {
+			padding: 16px 0;
+			color: #718096;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="dashboard-layout">
+		<div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+		<main class="main">
+			<header class="page-head"> <strong>Dashboard</strong> <span> Welcome back, <b
+						th:text="${customer.name}">Dinesh</b> </span> </header>
+			<div class="content"> <!-- Dashboard Statistics -->
+				<div class="stats">
+					<div class="card stat">
+						<div class="stat-label">My Vehicles</div>
+						<div class="stat-value" th:text="${vehicles.size()}">1</div>
+					</div>
+					<div class="card stat">
+						<div class="stat-label">Total Bookings</div>
+						<div class="stat-value" th:text="${bookings.size()}">12</div>
+					</div>
+					<div class="card stat">
+						<div class="stat-label">Upcoming Service</div>
+						<div class="stat-value"
+							th:text="${#lists.size(bookings.?[status.name() != 'COMPLETED' and status.name() != 'CANCELLED'])}">
+							1 </div>
+					</div>
+					<div class="card stat">
+					    <div class="stat-label">Total Spent</div>
+					    <div class="stat-value"
+					         th:text="${'₹' + #numbers.formatDecimal(totalSpent, 1, 'COMMA', 2, 'POINT')}">
+					        ₹0.00
+					    </div>
+					</div>
+				</div> <!-- Main Dashboard Sections -->
+				<div class="two-col"> <!-- Upcoming Services -->
+					<section class="card panel">
+						<h3>Upcoming Service</h3>
+						<div th:if="${bookings.empty}" class="empty"> No service bookings yet. </div>
+						<div class="upcoming-service-list">
+							<div th:each="b : ${bookings}"
+								th:if="${b.status.name() != 'COMPLETED' and b.status.name() != 'CANCELLED'}"
+								class="upcoming-service-item">
+								<div class="upcoming-service-details"> <b
+										th:text="${b.vehicle.make + ' ' + b.vehicle.model}"> Toyota Creta </b>
+									<!-- Display every service in this booking -->
+									<div class="upcoming-service-names"
+										th:if="${b.bookingItems != null and !b.bookingItems.isEmpty()}">
+										<th:block th:each="item, stat : ${b.bookingItems}"> <span
+												th:text="${item.service.name}">General Service</span>
+											<th:block th:if="${!stat.last}">, </th:block>
+										</th:block>
+									</div> <!-- Fallback for older bookings without booking items -->
+									<div class="upcoming-service-names"
+										th:if="${b.bookingItems == null or b.bookingItems.isEmpty()}"
+										th:text="${b.service != null ? b.service.name : 'Service unavailable'}"> General
+										Service </div>
+									<div style="font-size: 11px; color: #718096; margin-top: 4px;"
+										th:text="${#temporals.format(b.serviceDate, 'dd MMM yyyy')}"> 24 Oct 2026 </div>
+								</div> <span class="badge pending upcoming-service-status"
+									th:classappend="${b.status.name() == 'IN_PROGRESS' ? 'in-progress' : (b.status.name() == 'CANCELLED' ? 'cancelled' : '')}"
+									th:text="${b.status}"> PENDING </span>
+							</div>
+						</div>
+					</section> <!-- Quick Actions -->
+					<section class="card panel">
+						<h3>Quick Actions</h3> <a class="btn btn-primary" style="width: 100%; margin-bottom: 10px;"
+							href="/customer/book-service"> Book New Service </a> <a class="btn btn-outline"
+							style="width: 100%; margin-bottom: 10px;" href="/customer/vehicles"> Add/View Vehicles </a>
+						<a class="btn btn-outline" style="width: 100%;" href="/customer/bookings"> View Service History
+						</a>
+					</section>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+
+</html>

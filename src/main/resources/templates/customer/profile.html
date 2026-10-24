@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>My Profile | AutoCare</title>
+
+    <link rel="stylesheet" href="/css/app.css">
+
+    <style>
+
+        .profile-content {
+
+            max-width: 850px;
+
+            margin: 0 auto;
+
+        }
+
+        .profile-heading {
+
+            margin-bottom: 24px;
+
+        }
+
+        .profile-heading h2 {
+
+            margin: 0 0 8px;
+
+            font-size: 24px;
+
+            color: #0f172a;
+
+        }
+
+        .profile-heading p {
+
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+        }
+
+        .profile-card {
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+        }
+
+        .profile-section-title {
+
+            margin: 0 0 6px;
+
+            color: #0f172a;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+        }
+
+        .profile-section-description {
+
+            margin: 0 0 24px;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+        /* Profile photo */
+
+        .photo-section {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 24px;
+
+            flex-wrap: wrap;
+
+        }
+
+        .photo-preview {
+
+            width: 112px;
+
+            height: 112px;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #f1f5f9;
+
+            border: 3px solid #e2e8f0;
+
+            color: #64748b;
+
+        }
+
+        .photo-preview img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+        }
+
+        .photo-placeholder {
+
+            font-size: 38px;
+
+            font-weight: 700;
+
+        }
+
+        .photo-details {
+
+            flex: 1;
+
+            min-width: 220px;
+
+        }
+
+        .photo-details h3 {
+
+            margin: 0 0 8px;
+
+            color: #0f172a;
+
+            font-size: 16px;
+
+        }
+
+        .photo-details p {
+
+            margin: 0 0 16px;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+        .photo-actions {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+        .photo-actions .btn {
+
+            cursor: pointer;
+
+            text-align: center;
+
+        }
+
+        .photo-file-input {
+
+            display: none;
+
+        }
+
+        .photo-message {
+
+            margin-bottom: 20px;
+
+        }
+
+        .profile-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            gap: 20px;
+
+        }
+
+        .profile-grid .form-group {
+
+            margin-bottom: 0;
+
+        }
+
+        .profile-grid .full-width {
+
+            grid-column: 1 / -1;
+
+        }
+
+        .profile-grid label,
+
+        .password-form label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #334155;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+        }
+
+        .profile-grid .input,
+
+        .profile-grid .textarea {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+        }
+
+        .profile-grid .input:disabled {
+
+            background: #f1f5f9;
+
+            color: #64748b;
+
+            cursor: not-allowed;
+
+        }
+
+        .profile-grid .textarea {
+
+            min-height: 110px;
+
+            resize: vertical;
+
+        }
+
+        /* Account deactivation */
+        .deactivate-card {
+            margin-top: 24px;
+            border: 1px solid #fecaca;
+        }
+
+        .deactivate-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 7px;
+            background: #b91c1c;
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .deactivate-button:hover {
+            background: #991b1b;
+        }
+
+        .deactivate-button:focus-visible {
+            outline: 2px solid #b91c1c;
+            outline-offset: 3px;
+        }
+
+        .profile-divider {
+
+            height: 1px;
+
+            background: #e2e8f0;
+
+            margin: 28px 0;
+
+        }
+
+        .profile-actions {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 12px;
+
+            margin-top: 28px;
+
+        }
+
+        .profile-actions .btn {
+
+            min-width: 140px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+        }
+
+        /* Password fields */
+
+        .password-form .form-group {
+
+            margin-bottom: 20px;
+
+        }
+
+        .password-wrapper {
+
+            position: relative;
+
+            width: 100%;
+
+        }
+
+        .password-wrapper .input {
+
+            display: block;
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding-right: 48px;
+
+        }
+
+        .password-toggle {
+
+            position: absolute;
+
+            top: 50%;
+
+            right: 12px;
+
+            transform: translateY(-50%);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 32px;
+
+            height: 32px;
+
+            padding: 5px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: #64748b;
+
+            cursor: pointer;
+
+        }
+
+        .password-toggle:hover {
+
+            color: #e9423a;
+
+            background: #fef2f2;
+
+        }
+
+        .password-toggle:focus-visible {
+
+            outline: 2px solid #e9423a;
+
+            outline-offset: 2px;
+
+        }
+
+        .password-toggle svg {
+
+            width: 20px;
+
+            height: 20px;
+
+            pointer-events: none;
+
+        }
+
+        .password-message {
+
+            margin-bottom: 20px;
+
+        }
+
+        @media (max-width: 640px) {
+
+            .profile-card {
+
+                padding: 20px;
+
+            }
+
+            .profile-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .profile-grid .full-width {
+
+                grid-column: auto;
+
+            }
+
+            .profile-actions {
+
+                flex-direction: column;
+
+            }
+
+            .profile-actions .btn {
+
+                width: 100%;
+
+                box-sizing: border-box;
+
+            }
+
+            .photo-section {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+            }
+
+            .photo-details {
+
+                min-width: 0;
+
+                width: 100%;
+
+            }
+
+        }
+
+		/* Profile photo full-screen viewer */
+
+		.photo-viewer {
+
+		    display: none;
+
+		    position: fixed;
+
+		    z-index: 99999;
+
+		    inset: 0;
+
+		    width: 100%;
+
+		    height: 100%;
+
+		    background: rgba(0, 0, 0, 0.88);
+
+		    align-items: center;
+
+		    justify-content: center;
+
+		    padding: 25px;
+
+		    box-sizing: border-box;
+
+		}
+
+		.photo-viewer.active {
+
+		    display: flex;
+
+		}
+
+		.photo-viewer-image {
+
+		    max-width: 90vw;
+
+		    max-height: 85vh;
+
+		    width: auto;
+
+		    height: auto;
+
+		    object-fit: contain;
+
+		    border-radius: 8px;
+
+		    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+		}
+
+		.photo-viewer-close {
+
+		    position: absolute;
+
+		    top: 20px;
+
+		    right: 30px;
+
+		    border: none;
+
+		    background: transparent;
+
+		    color: white;
+
+		    font-size: 38px;
+
+		    cursor: pointer;
+
+		    line-height: 1;
+
+		}
+
+		.photo-viewer-close:hover {
+
+		    color: #ff6b6b;
+
+		}
+
+		.profile-photo-clickable {
+
+		    cursor: pointer;
+
+		    transition: transform 0.2s ease;
+
+		}
+
+		.profile-photo-clickable:hover {
+
+		    transform: scale(1.04);
+
+		}
+
+		/* Photo cropping modal */
+
+		.crop-modal {
+
+		    display: none;
+
+		    position: fixed;
+
+		    inset: 0;
+
+		    z-index: 100000;
+
+		    background: rgba(0, 0, 0, 0.8);
+
+		    align-items: center;
+
+		    justify-content: center;
+
+		    padding: 20px;
+
+		}
+
+		.crop-modal.active {
+
+		    display: flex;
+
+		}
+
+		.crop-modal-content {
+
+		    background: #fff;
+
+		    width: 100%;
+
+		    max-width: 600px;
+
+		    max-height: 95vh;
+
+		    overflow-y: auto;
+
+		    border-radius: 14px;
+
+		    padding: 22px;
+
+		    box-sizing: border-box;
+
+		}
+
+		.crop-modal-header {
+
+		    display: flex;
+
+		    align-items: center;
+
+		    justify-content: space-between;
+
+		    margin-bottom: 18px;
+
+		}
+
+		.crop-modal-header h2 {
+
+		    margin: 0;
+
+		    font-size: 21px;
+
+		    color: #0f172a;
+
+		}
+
+		.crop-close {
+
+		    border: none;
+
+		    background: transparent;
+
+		    font-size: 32px;
+
+		    cursor: pointer;
+
+		    color: #64748b;
+
+		}
+
+		.crop-image-container {
+
+		    width: 100%;
+
+		    height: 350px;
+
+		    background: #f1f5f9;
+
+		    overflow: hidden;
+
+		}
+
+		.crop-image-container img {
+
+		    display: block;
+
+		    max-width: 100%;
+
+		}
+
+		.crop-controls,
+
+		.crop-modal-actions {
+
+		    display: flex;
+
+		    justify-content: center;
+
+		    flex-wrap: wrap;
+
+		    gap: 10px;
+
+		    margin-top: 18px;
+
+		}
+
+		.crop-controls button,
+
+		.crop-modal-actions button {
+
+		    border: none;
+
+		    padding: 11px 16px;
+
+		    border-radius: 7px;
+
+		    cursor: pointer;
+
+		    font-weight: 600;
+
+		}
+
+		#zoomInBtn,
+
+		#zoomOutBtn,
+
+		#rotateBtn,
+
+		#cancelCropBtn {
+
+		    background: #e9eef5;
+
+		    color: #0f172a;
+
+		}
+
+		#cropUploadBtn {
+
+		    background: #dc3732;
+
+		    color: white;
+
+		}
+
+		#cropUploadBtn:disabled {
+
+		    opacity: 0.6;
+
+		    cursor: not-allowed;
+
+		}
+
+		@media (max-width: 480px) {
+
+		    .crop-modal-content {
+
+		        padding: 14px;
+
+		    }
+
+		    .crop-image-container {
+
+		        height: 280px;
+
+		    }
+
+		}
+
+    </style>
+
+	<!-- Cropper.js CSS -->
+
+	<link rel="stylesheet"
+
+	      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <div th:replace="~{fragments/sidebar :: sidebar('profile')}"></div>
+
+    <main class="main">
+
+        <header class="page-head">
+
+            <strong>My Profile</strong>
+
+        </header>
+
+        <div class="content profile-content">
+
+            <div class="profile-heading">
+
+                <h2>Personal Information</h2>
+
+                <p>
+
+                    Manage your personal details and keep your contact
+
+                    information up to date.
+
+                </p>
+
+            </div>
+
+            <!-- PROFILE PHOTO CARD -->
+
+            <div class="card panel profile-card">
+
+                <h3 class="profile-section-title">Profile Photo</h3>
+
+                <p class="profile-section-description">
+
+                    Upload a photo to personalize your AutoCare account.
+
+                </p>
+
+                <div
+
+                    th:if="${photoSuccess}"
+
+                    class="notice photo-message"
+
+                    role="status"
+
+                    th:text="${photoSuccess}">
+
+                </div>
+
+                <div
+
+                    th:if="${photoError}"
+
+                    class="notice photo-message"
+
+                    role="alert"
+
+                    th:text="${photoError}">
+
+                </div>
+
+                <div class="photo-section">
+
+                    <!-- Photo preview -->
+
+                    <div class="photo-preview">
+
+                        <img
+
+                            id="profilePhotoPreview"
+
+                            th:if="${customer.profilePhoto != null and !customer.profilePhoto.isBlank()}"
+
+                            th:src="@{/uploads/customers/{filename}(filename=${customer.profilePhoto})}"
+
+                            alt="Profile photo">
+
+                        <span
+
+                            th:if="${customer.profilePhoto == null or customer.profilePhoto.isBlank()}"
+
+                            class="photo-placeholder"
+
+                            th:text="${#strings.substring(customer.name, 0, 1).toUpperCase()}">
+
+                            D
+
+                        </span>
+
+                    </div>
+
+                    <!-- Photo upload controls -->
+
+                    <div class="photo-details">
+
+                        <h3 th:text="${customer.name}">Customer Name</h3>
+
+                        <p>
+
+                            JPG, PNG or WEBP. Maximum file size: 5 MB.
+
+                        </p>
+
+                        <div class="photo-actions">
+
+                            <form
+
+                                id="photoUploadForm"
+
+                                method="post"
+
+                                action="/customer/profile/photo"
+
+                                enctype="multipart/form-data">
+
+                                <input
+
+                                    type="file"
+
+                                    id="profilePhoto"
+
+                                    name="profilePhoto"
+
+                                    class="photo-file-input"
+
+                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+
+                                    required>
+
+                                <button
+
+                                    type="button"
+
+                                    class="btn btn-primary"
+
+                                    onclick="document.getElementById('profilePhoto').click()">
+
+                                    <span
+
+                                        th:text="${customer.profilePhoto != null and !customer.profilePhoto.isBlank() ? 'Change Photo' : 'Upload Photo'}">
+
+                                        Upload Photo
+
+                                    </span>
+
+                                </button>
+
+                            </form>
+
+                            <form
+
+                                th:if="${customer.profilePhoto != null and !customer.profilePhoto.isBlank()}"
+
+                                method="post"
+
+                                action="/customer/profile/photo/remove"
+
+                                onsubmit="return confirm('Are you sure you want to remove your profile photo?');">
+
+                                <button
+
+                                    type="submit"
+
+                                    class="btn btn-light">
+
+                                    Remove Photo
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PERSONAL INFORMATION CARD -->
+
+            <div class="card panel profile-card" style="margin-top: 24px;">
+
+                <div
+
+                    th:if="${param.saved}"
+
+                    class="notice"
+
+                    role="status">
+
+                    Profile updated successfully.
+
+                </div>
+
+                <div
+
+                    th:if="${profileError}"
+
+                    class="notice"
+
+                    role="alert"
+
+                    th:text="${profileError}">
+
+                </div>
+
+                <h3 class="profile-section-title">Personal Details</h3>
+
+                <p class="profile-section-description">
+
+                    Update your name, phone number and address.
+
+                </p>
+
+                <form method="post" action="/customer/profile">
+
+                    <div class="profile-grid">
+
+                        <div class="form-group">
+
+                            <label for="name">Full Name</label>
+
+                            <input
+
+                                class="input"
+
+                                type="text"
+
+                                id="name"
+
+                                name="name"
+
+                                th:value="${customer.name}"
+
+                                placeholder="Enter your full name"
+
+                                autocomplete="name"
+
+                                maxlength="100"
+
+                                required>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="email">Email Address</label>
+
+                            <input
+
+                                class="input"
+
+                                type="email"
+
+                                id="email"
+
+                                th:value="${customer.email}"
+
+                                autocomplete="email"
+
+                                disabled>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="phone">Phone Number</label>
+
+                            <input
+
+                                class="input"
+
+                                type="tel"
+
+                                id="phone"
+
+                                name="phone"
+
+                                th:value="${customer.phone}"
+
+                                placeholder="Enter your phone number"
+
+                                autocomplete="tel"
+
+                                maxlength="20">
+
+                        </div>
+
+                        <div class="form-group full-width">
+
+                            <label for="address">Address</label>
+
+                            <textarea
+
+                                class="textarea"
+
+                                id="address"
+
+                                name="address"
+
+                                th:text="${customer.address}"
+
+                                placeholder="Enter your address"
+
+                                autocomplete="street-address"
+
+                                maxlength="500"></textarea>
+
+                        </div>
+
+                    </div>
+
+                    <div class="profile-actions">
+
+                        <button
+
+                            type="reset"
+
+                            class="btn btn-light">
+
+                            Reset Changes
+
+                        </button>
+
+                        <button
+
+                            type="submit"
+
+                            class="btn btn-primary">
+
+                            Save Changes
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- ACCOUNT SECURITY CARD -->
+
+            <div class="card panel profile-card" style="margin-top: 24px;">
+
+                <h3 class="profile-section-title">Account Security</h3>
+
+                <p class="profile-section-description">
+
+                    Change your password to keep your account secure.
+
+                </p>
+
+                <div
+
+                    th:if="${passwordError}"
+
+                    class="notice password-message"
+
+                    role="alert"
+
+                    th:text="${passwordError}">
+
+                </div>
+
+                <div
+
+                    th:if="${passwordSuccess}"
+
+                    class="notice password-message"
+
+                    role="status"
+
+                    th:text="${passwordSuccess}">
+
+                </div>
+
+                <form
+
+                    class="password-form"
+
+                    method="post"
+
+                    action="/customer/profile/change-password">
+
+                    <!-- Current password -->
+
+                    <div class="form-group">
+
+                        <label for="currentPassword">Current Password</label>
+
+                        <div class="password-wrapper">
+
+                            <input
+
+                                class="input"
+
+                                type="password"
+
+                                id="currentPassword"
+
+                                name="currentPassword"
+
+                                autocomplete="current-password"
+
+                                required>
+
+                            <button
+
+                                type="button"
+
+                                class="password-toggle"
+
+                                aria-label="Show current password"
+
+                                aria-pressed="false"
+
+                                onclick="togglePassword('currentPassword', this)">
+
+                                <svg viewBox="0 0 24 24"
+
+                                     fill="none"
+
+                                     stroke="currentColor"
+
+                                     stroke-width="1.8"
+
+                                     stroke-linecap="round"
+
+                                     stroke-linejoin="round">
+
+                                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
+
+                                    <circle cx="12" cy="12" r="3"/>
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- New password -->
+
+                    <div class="form-group">
+
+                        <label for="newPassword">New Password</label>
+
+                        <div class="password-wrapper">
+
+                            <input
+
+                                class="input"
+
+                                type="password"
+
+                                id="newPassword"
+
+                                name="newPassword"
+
+                                minlength="8"
+
+                                autocomplete="new-password"
+
+                                required>
+
+                            <button
+
+                                type="button"
+
+                                class="password-toggle"
+
+                                aria-label="Show new password"
+
+                                aria-pressed="false"
+
+                                onclick="togglePassword('newPassword', this)">
+
+                                <svg viewBox="0 0 24 24"
+
+                                     fill="none"
+
+                                     stroke="currentColor"
+
+                                     stroke-width="1.8"
+
+                                     stroke-linecap="round"
+
+                                     stroke-linejoin="round">
+
+                                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
+
+                                    <circle cx="12" cy="12" r="3"/>
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Confirm password -->
+
+                    <div class="form-group">
+
+                        <label for="confirmPassword">Confirm New Password</label>
+
+                        <div class="password-wrapper">
+
+                            <input
+
+                                class="input"
+
+                                type="password"
+
+                                id="confirmPassword"
+
+                                name="confirmPassword"
+
+                                minlength="8"
+
+                                autocomplete="new-password"
+
+                                required>
+
+                            <button
+
+                                type="button"
+
+                                class="password-toggle"
+
+                                aria-label="Show password confirmation"
+
+                                aria-pressed="false"
+
+                                onclick="togglePassword('confirmPassword', this)">
+
+                                <svg viewBox="0 0 24 24"
+
+                                     fill="none"
+
+                                     stroke="currentColor"
+
+                                     stroke-width="1.8"
+
+                                     stroke-linecap="round"
+
+                                     stroke-linejoin="round">
+
+                                    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
+
+                                    <circle cx="12" cy="12" r="3"/>
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="profile-actions">
+
+                        <button
+
+                            type="submit"
+
+                            class="btn btn-primary">
+
+                            Change Password
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+            <!-- ACCOUNT DEACTIVATION CARD -->
+            <div class="card panel profile-card deactivate-card">
+                <h3 class="profile-section-title">Deactivate Account</h3>
+                <p class="profile-section-description">
+                    Deactivating your account will sign you out and prevent you from logging in.
+                    Your existing vehicles, bookings, payments and invoices will be preserved.
+                </p>
+
+                <form method="post"
+                      th:action="@{/customer/profile/deactivate}"
+                      onsubmit="return confirm('Are you sure you want to deactivate your account? You will be signed out immediately.');">
+                    <button type="submit" class="deactivate-button">
+                        Deactivate Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Full-size profile photo viewer -->
+
+<div id="photoViewer" class="photo-viewer"
+
+     role="dialog"
+
+     aria-modal="true"
+
+     aria-label="Profile photo">
+
+    <button type="button"
+
+            id="closePhotoViewer"
+
+            class="photo-viewer-close"
+
+            aria-label="Close photo">&times;</button>
+
+    <img id="photoViewerImage"
+
+         class="photo-viewer-image"
+
+         src=""
+
+         alt="Full-size profile photo">
+
+</div>
+
+<!-- Profile Photo Cropping Modal -->
+
+<div id="cropModal" class="crop-modal">
+
+    <div class="crop-modal-content">
+
+        <div class="crop-modal-header">
+
+            <h2>Crop Profile Photo</h2>
+
+            <button type="button" id="closeCropModal"
+
+                    class="crop-close">&times;</button>
+
+        </div>
+
+        <div class="crop-image-container">
+
+            <img id="cropImage" src="" alt="Image to crop">
+
+        </div>
+
+        <div class="crop-controls">
+
+            <button type="button" id="zoomOutBtn">− Zoom Out</button>
+
+            <button type="button" id="zoomInBtn">+ Zoom In</button>
+
+            <button type="button" id="rotateBtn">↻ Rotate</button>
+
+        </div>
+
+        <div class="crop-modal-actions">
+
+            <button type="button" id="cancelCropBtn">Cancel</button>
+
+            <button type="button" id="cropUploadBtn">Crop &amp; Upload</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Cropper.js JavaScript -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
+<script>
+
+    // ==========================================
+
+    // 1. SHOW OR HIDE PASSWORD FIELDS
+
+    // ==========================================
+
+    function togglePassword(inputId, button) {
+
+        const input = document.getElementById(inputId);
+
+        if (!input) {
+
+            return;
+
+        }
+
+        const isHidden = input.type === "password";
+
+        input.type = isHidden ? "text" : "password";
+
+        button.setAttribute(
+
+            "aria-label",
+
+            isHidden ? "Hide password" : "Show password"
+
+        );
+
+        button.setAttribute("aria-pressed", String(isHidden));
+
+        if (isHidden) {
+
+            button.innerHTML = `
+
+                <svg viewBox="0 0 24 24"
+
+                     fill="none"
+
+                     stroke="currentColor"
+
+                     stroke-width="1.8"
+
+                     stroke-linecap="round"
+
+                     stroke-linejoin="round">
+
+                    <path d="M3 3l18 18"/>
+
+                    <path d="M10.6 10.6a2 2 0 002.8 2.8"/>
+
+                    <path d="M9.9 5.2A10.8 10.8 0 0112 5
+
+                        c6.4 0 10 7 10 7
+
+                        a15 15 0 01-3.1 3.8"/>
+
+                    <path d="M6.2 6.2C3.5 8 2 12 2 12
+
+                        s3.6 7 10 7
+
+                        a10.5 10.5 0 004.1-.8"/>
+
+                </svg>`;
+
+        } else {
+
+            button.innerHTML = `
+
+                <svg viewBox="0 0 24 24"
+
+                     fill="none"
+
+                     stroke="currentColor"
+
+                     stroke-width="1.8"
+
+                     stroke-linecap="round"
+
+                     stroke-linejoin="round">
+
+                    <path d="M2 12s3.6-7 10-7
+
+                        10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
+
+                    <circle cx="12" cy="12" r="3"/>
+
+                </svg>`;
+
+        }
+
+    }
+
+
+    // ==========================================
+
+    // 2. PROFILE PHOTO CROPPING AND UPLOADING
+
+    // ==========================================
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const fileInput = document.getElementById("profilePhoto");
+
+        const uploadForm = document.getElementById("photoUploadForm");
+
+        const cropModal = document.getElementById("cropModal");
+
+        const cropImage = document.getElementById("cropImage");
+
+        const closeCropModal = document.getElementById("closeCropModal");
+
+        const cancelCropBtn = document.getElementById("cancelCropBtn");
+
+        const zoomInBtn = document.getElementById("zoomInBtn");
+
+        const zoomOutBtn = document.getElementById("zoomOutBtn");
+
+        const rotateBtn = document.getElementById("rotateBtn");
+
+        const cropUploadBtn = document.getElementById("cropUploadBtn");
+
+        if (
+
+            !fileInput ||
+
+            !uploadForm ||
+
+            !cropModal ||
+
+            !cropImage ||
+
+            !closeCropModal ||
+
+            !cancelCropBtn ||
+
+            !zoomInBtn ||
+
+            !zoomOutBtn ||
+
+            !rotateBtn ||
+
+            !cropUploadBtn
+
+        ) {
+
+            console.error(
+
+                "Photo cropping elements are missing from profile.html."
+
+            );
+
+            return;
+
+        }
+
+        let cropper = null;
+
+        let currentObjectUrl = null;
+
+        let isUploading = false;
+
+        const originalButtonText = "Crop & Upload";
+
+
+        // Close the crop window and clean up.
+
+        function closeCropper() {
+
+            cropModal.classList.remove("active");
+
+            if (cropper) {
+
+                cropper.destroy();
+
+                cropper = null;
+
+            }
+
+            cropImage.removeAttribute("src");
+
+            if (currentObjectUrl) {
+
+                URL.revokeObjectURL(currentObjectUrl);
+
+                currentObjectUrl = null;
+
+            }
+
+            fileInput.value = "";
+
+            isUploading = false;
+
+            cropUploadBtn.disabled = false;
+
+            cropUploadBtn.textContent = originalButtonText;
+
+            document.body.style.overflow = "";
+
+        }
+
+
+        // Open the cropping window when a photo is selected.
+
+        fileInput.addEventListener("change", function () {
+
+            const file = fileInput.files[0];
+
+            if (!file) {
+
+                return;
+
+            }
+
+            const allowedTypes = [
+
+                "image/jpeg",
+
+                "image/png",
+
+                "image/webp"
+
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+
+                alert("Please select a JPG, PNG, or WEBP image.");
+
+                fileInput.value = "";
+
+                return;
+
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                alert("The image must be 5 MB or smaller.");
+
+                fileInput.value = "";
+
+                return;
+
+            }
+
+            if (typeof Cropper === "undefined") {
+
+                alert(
+
+                    "The cropping library could not load. " +
+
+                    "Check your internet connection and refresh the page."
+
+                );
+
+                fileInput.value = "";
+
+                return;
+
+            }
+
+            if (cropper) {
+
+                cropper.destroy();
+
+                cropper = null;
+
+            }
+
+            if (currentObjectUrl) {
+
+                URL.revokeObjectURL(currentObjectUrl);
+
+            }
+
+            currentObjectUrl = URL.createObjectURL(file);
+
+            cropImage.onload = function () {
+
+                if (cropper) {
+
+                    cropper.destroy();
+
+                    cropper = null;
+
+                }
+
+                cropper = new Cropper(cropImage, {
+
+                    aspectRatio: 1,
+
+                    viewMode: 1,
+
+                    dragMode: "move",
+
+                    autoCropArea: 0.85,
+
+                    responsive: true,
+
+                    background: false,
+
+                    guides: true,
+
+                    center: true,
+
+                    movable: true,
+
+                    zoomable: true,
+
+                    rotatable: true,
+
+                    scalable: false,
+
+                    checkOrientation: true
+
+                });
+
+                cropModal.classList.add("active");
+
+                document.body.style.overflow = "hidden";
+
+            };
+
+            cropImage.onerror = function () {
+
+                alert("Unable to open this image. Please select another.");
+
+                closeCropper();
+
+            };
+
+            cropImage.src = currentObjectUrl;
+
+        });
+
+
+        // Zoom in.
+
+        zoomInBtn.addEventListener("click", function () {
+
+            if (cropper) {
+
+                cropper.zoom(0.1);
+
+            }
+
+        });
+
+
+        // Zoom out.
+
+        zoomOutBtn.addEventListener("click", function () {
+
+            if (cropper) {
+
+                cropper.zoom(-0.1);
+
+            }
+
+        });
+
+
+        // Rotate the image 90 degrees.
+
+        rotateBtn.addEventListener("click", function () {
+
+            if (cropper) {
+
+                cropper.rotate(90);
+
+            }
+
+        });
+
+
+        // Cancel cropping.
+
+        closeCropModal.addEventListener("click", closeCropper);
+
+        cancelCropBtn.addEventListener("click", closeCropper);
+
+
+        // Close when the dark background is clicked.
+
+        cropModal.addEventListener("click", function (event) {
+
+            if (event.target === cropModal) {
+
+                closeCropper();
+
+            }
+
+        });
+
+
+        // Close cropping when Escape is pressed.
+
+        document.addEventListener("keydown", function (event) {
+
+            if (
+
+                event.key === "Escape" &&
+
+                cropModal.classList.contains("active")
+
+            ) {
+
+                closeCropper();
+
+            }
+
+        });
+
+
+        // Crop the image and upload only the cropped result.
+
+        cropUploadBtn.addEventListener("click", function () {
+
+            if (!cropper || isUploading) {
+
+                return;
+
+            }
+
+            isUploading = true;
+
+            cropUploadBtn.disabled = true;
+
+            cropUploadBtn.textContent = "Uploading...";
+
+            const canvas = cropper.getCroppedCanvas({
+
+                width: 600,
+
+                height: 600,
+
+                imageSmoothingEnabled: true,
+
+                imageSmoothingQuality: "high"
+
+            });
+
+            if (!canvas) {
+
+                alert("Could not crop this image. Please try another.");
+
+                isUploading = false;
+
+                cropUploadBtn.disabled = false;
+
+                cropUploadBtn.textContent = originalButtonText;
+
+                return;
+
+            }
+
+            canvas.toBlob(function (blob) {
+
+                if (!blob) {
+
+                    alert("Could not process the cropped image.");
+
+                    isUploading = false;
+
+                    cropUploadBtn.disabled = false;
+
+                    cropUploadBtn.textContent = originalButtonText;
+
+                    return;
+
+                }
+
+                // Create the cropped image file.
+
+                const croppedFile = new File(
+
+                    [blob],
+
+                    "profile-photo.jpg",
+
+                    { type: "image/jpeg" }
+
+                );
+
+                // Replace the original file with the cropped file.
+
+                const transfer = new DataTransfer();
+
+                transfer.items.add(croppedFile);
+
+                fileInput.files = transfer.files;
+
+                // Submit the existing Spring Boot upload form.
+
+                // Do not close the modal here: the form is navigating away.
+
+                uploadForm.requestSubmit();
+
+            }, "image/jpeg", 0.92);
+
+        });
+
+    });
+
+
+    // ==========================================
+
+    // 3. WHATSAPP-STYLE FULL-SIZE PROFILE VIEWER
+
+    // ==========================================
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const viewer = document.getElementById("photoViewer");
+
+        const viewerImage = document.getElementById("photoViewerImage");
+
+        const closeButton = document.getElementById("closePhotoViewer");
+
+        if (!viewer || !viewerImage || !closeButton) {
+
+            return;
+
+        }
+
+        const profilePhoto = document.querySelector(
+
+            ".photo-preview img, img.profile-photo-clickable"
+
+        );
+
+        if (profilePhoto) {
+
+            profilePhoto.classList.add("profile-photo-clickable");
+
+            profilePhoto.addEventListener("click", function () {
+
+                if (
+
+                    !profilePhoto.src ||
+
+                    !profilePhoto.complete ||
+
+                    profilePhoto.naturalWidth === 0
+
+                ) {
+
+                    return;
+
+                }
+
+                viewerImage.src = profilePhoto.src;
+
+                viewer.classList.add("active");
+
+                document.body.style.overflow = "hidden";
+
+            });
+
+        }
+
+
+        // Close the full-size viewer.
+
+        function closeViewer() {
+
+            viewer.classList.remove("active");
+
+            viewerImage.src = "";
+
+            document.body.style.overflow = "";
+
+        }
+
+        closeButton.addEventListener("click", closeViewer);
+
+
+        // Close when the background is clicked.
+
+        viewer.addEventListener("click", function (event) {
+
+            if (event.target === viewer) {
+
+                closeViewer();
+
+            }
+
+        });
+
+
+        // Close when Escape is pressed.
+
+        document.addEventListener("keydown", function (event) {
+
+            if (
+
+                event.key === "Escape" &&
+
+                viewer.classList.contains("active")
+
+            ) {
+
+                closeViewer();
+
+            }
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bookings | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Page layout */
+        .bookings-container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 26px 30px;
+        }
+
+        .bookings-intro {
+            margin-bottom: 22px;
+        }
+
+        .bookings-intro p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Success message */
+        .booking-notice {
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border: 1px solid #bbf7d0;
+            border-radius: 9px;
+            background: #f0fdf4;
+            color: #15803d;
+            font-size: 13px;
+        }
+
+        /* Centered search bar */
+        .booking-search-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 0 auto 24px;
+        }
+
+        .booking-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 680px;
+            min-height: 50px;
+            padding: 6px 8px 6px 16px;
+            border: 1px solid #dbe3ed;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .booking-search:focus-within {
+            border-color: #e9423a;
+            box-shadow: 0 0 0 3px rgba(233, 66, 58, 0.09);
+        }
+
+        .search-icon {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            color: #8492a6;
+        }
+
+        .search-icon svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .booking-search input {
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+            height: 36px;
+            padding: 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #172b4d;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .booking-search input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-clear {
+            display: none;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 19px;
+            cursor: pointer;
+        }
+
+        .search-clear:hover {
+            background: #e2e8f0;
+        }
+
+        .search-clear.visible {
+            display: inline-flex;
+        }
+
+        .booking-search-hint {
+            margin: -14px 0 22px;
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* Search result count */
+        .booking-results {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .booking-results strong {
+            color: #334155;
+        }
+
+        /* Table container */
+        .booking-table-card {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e4e8ef;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .booking-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+        }
+
+        .booking-table th {
+            padding: 15px 12px;
+            background: #f5f7fa;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+		/* Booking table cells */
+		.booking-table td {
+		    padding: 17px 12px;
+		    border-bottom: 1px solid #edf0f4;
+		    color: #475569;
+		    font-size: 13px;
+		    vertical-align: middle;
+		    white-space: nowrap;
+		}
+
+		/* Service column: fixed width and multiple lines */
+		.booking-table td.booking-services-cell {
+		    width: 420px;
+		    min-width: 420px;
+		    max-width: 420px;
+		    white-space: normal;
+		    line-height: 1.8;
+		    overflow-wrap: anywhere;
+		    word-break: normal;
+		}
+
+		/* Selected services */
+		.booking-services {
+		    display: block;
+		    white-space: normal;
+		    line-height: 1.8;
+		}
+
+		/* Last booking row */
+		.booking-table tbody tr:last-child td {
+		    border-bottom: none;
+		}
+
+        .booking-table tbody tr:hover {
+            background: #fafbfd;
+        }
+
+        /* Removed vehicle indicator */
+        .vehicle-removed {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Booking status badges */
+        .booking-status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .booking-status.completed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .booking-status.progress {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .booking-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .booking-status.cancelled {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Invoice button */
+        .booking-view-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            min-height: 38px;
+            padding: 8px 14px;
+            border-radius: 7px;
+            background: #edf2f7;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .booking-view-button:hover {
+            background: #dfe7f0;
+        }
+
+        /* Empty states */
+        .booking-empty-state {
+            padding: 42px 20px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .booking-empty-state h3 {
+            margin: 0 0 8px;
+            color: #172b4d;
+            font-size: 18px;
+        }
+
+        .booking-empty-state p {
+            margin: 0 0 16px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .booking-empty-state a {
+            color: #e9423a;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .booking-empty-state a:hover {
+            text-decoration: underline;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .bookings-container {
+                padding: 18px 14px;
+            }
+
+            .booking-search {
+                max-width: 100%;
+            }
+
+            .booking-table th,
+            .booking-table td {
+                padding: 13px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bookings-container {
+                padding: 14px 10px;
+            }
+
+            .booking-search {
+                min-height: 46px;
+            }
+
+            .booking-search-hint {
+                font-size: 10px;
+            }
+        }
+		
+		/* Error message */
+		.booking-error {
+		    margin-bottom: 20px;
+		    padding: 13px 16px;
+		    border: 1px solid #fecaca;
+		    border-radius: 9px;
+		    background: #fef2f2;
+		    color: #b91c1c;
+		    font-size: 13px;
+		}
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- Existing sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar('bookings')}"></div>
+
+    <main class="main">
+
+        <header class="page-head">
+            <strong>My Bookings</strong>
+
+            <a class="btn btn-primary"
+               th:href="@{/customer/book-service}">
+                Book Service
+            </a>
+        </header>
+
+        <div class="content">
+
+            <div class="bookings-container">
+
+				<!-- Success message -->
+				<div th:if="${successMessage != null}"
+				     class="booking-notice"
+				     th:text="${successMessage}">
+				    Your booking was successful.
+				</div>
+
+				<!-- Error message -->
+				<div th:if="${errorMessage != null}"
+				     class="booking-error"
+				     th:text="${errorMessage}">
+				    Unable to process your booking.
+				</div>
+                <div class="bookings-intro">
+                    <p>View and track your vehicle service bookings and invoices.</p>
+                </div>
+
+                <!-- Centered search bar -->
+                <div class="booking-search-wrapper"
+                     th:if="${bookings != null and !bookings.isEmpty()}">
+
+                    <div class="booking-search">
+
+                        <span class="search-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <path d="m16 16 4 4"></path>
+                            </svg>
+                        </span>
+
+                        <input type="search"
+                               id="bookingSearchInput"
+                               placeholder="Search vehicle, service, date, time, amount or status..."
+                               aria-label="Search bookings"
+                               autocomplete="off">
+
+                        <button type="button"
+                                id="clearBookingSearch"
+                                class="search-clear"
+                                aria-label="Clear search"
+                                title="Clear search">
+                            &times;
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <p class="booking-search-hint"
+                   th:if="${bookings != null and !bookings.isEmpty()}">
+                    Search by vehicle, service type, date, time, amount or booking status.
+                </p>
+
+                <!-- Search results count -->
+                <div class="booking-results"
+                     id="bookingResults"
+                     th:if="${bookings != null and !bookings.isEmpty()}">
+
+                    <span>
+                        Bookings found:
+                        <strong id="visibleBookingCount"
+                                th:text="${bookings.size()}">0</strong>
+                    </span>
+
+                    <span id="bookingSearchStatus" aria-live="polite"></span>
+
+                </div>
+
+                <!-- Bookings table -->
+                <div class="booking-table-card">
+
+                    <table class="booking-table"
+                           id="bookingTable"
+                           th:if="${bookings != null and !bookings.isEmpty()}">
+
+                        <thead>
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Invoice</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="bookingTableBody">
+
+                        <tr th:each="b : ${bookings}"
+                            class="booking-row">
+
+                            <!-- Vehicle details -->
+                            <td>
+                                <div>
+                                    <span th:text="${b.vehicle.make + ' ' + b.vehicle.model}">
+                                        Vehicle Name
+                                    </span>
+                                </div>
+
+                                <span th:if="${b.vehicle.deleted}"
+                                      class="vehicle-removed">
+                                    Vehicle Removed
+                                </span>
+                            </td>
+
+							<!-- All selected services -->
+							<td class="booking-services-cell">
+							    <div th:if="${b.bookingItems != null and !b.bookingItems.isEmpty()}"
+							         class="booking-services">
+
+							        <th:block th:each="item, stat : ${b.bookingItems}">
+							            <span th:if="${item.service != null}"
+							                  th:text="${item.service.name}">Service</span><span
+							                  th:if="${!stat.last}">, </span>
+							        </th:block>
+
+							    </div>
+
+							    <span th:if="${b.bookingItems == null or b.bookingItems.isEmpty()}"
+							          th:text="${b.service != null ? b.service.name : 'Not available'}">
+							        Service Name
+							    </span>
+							</td>
+
+                            <!-- Date -->
+                            <td th:text="${b.serviceDate}">
+                                Service Date
+                            </td>
+
+                            <!-- Time -->
+                            <td th:text="${b.serviceTime}">
+                                Service Time
+                            </td>
+
+                            <!-- Amount -->
+                            <td th:text="${'₹' + b.estimatedAmount}">
+                                ₹0
+                            </td>
+
+                            <!-- Booking status -->
+                            <td>
+                                <span class="booking-status"
+                                      th:classappend="${b.status.name() == 'COMPLETED'
+                                          ? ' completed'
+                                          : (b.status.name() == 'IN_PROGRESS'
+                                              ? ' progress'
+                                              : (b.status.name() == 'CANCELLED'
+                                                  ? ' cancelled'
+                                                  : ' pending'))}"
+                                      th:text="${b.status}">
+                                    PENDING
+                                </span>
+                            </td>
+
+                            <!-- Existing invoice route preserved -->
+                            <td>
+                                <a class="booking-view-button"
+                                   th:href="@{'/customer/invoice/' + ${b.id}}">
+                                    View
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                    <!-- No bookings available -->
+                    <div th:if="${bookings == null or bookings.isEmpty()}"
+                         class="booking-empty-state">
+
+                        <h3>No Bookings Found</h3>
+
+                        <p>Your vehicle service bookings will appear here.</p>
+
+                        <a th:href="@{/customer/book-service}">
+                            Book your first service
+                        </a>
+
+                    </div>
+
+                    <!-- No matching search results -->
+                    <div class="booking-empty-state"
+                         id="noBookingSearchResults"
+                         hidden>
+
+                        <h3>No Matching Bookings</h3>
+
+                        <p>
+                            No bookings match your search.
+                            Try another vehicle, service, date or status.
+                        </p>
+
+                        <a href="#"
+                           id="resetBookingSearch">
+                            Clear search and show all bookings
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("bookingSearchInput");
+
+        const clearButton =
+            document.getElementById("clearBookingSearch");
+
+        const resetLink =
+            document.getElementById("resetBookingSearch");
+
+        const tableBody =
+            document.getElementById("bookingTableBody");
+
+        const visibleCount =
+            document.getElementById("visibleBookingCount");
+
+        const searchStatus =
+            document.getElementById("bookingSearchStatus");
+
+        const noResults =
+            document.getElementById("noBookingSearchResults");
+
+        const bookingTable =
+            document.getElementById("bookingTable");
+
+        if (!searchInput || !tableBody) {
+            return;
+        }
+
+        const rows = Array.from(
+            tableBody.querySelectorAll(".booking-row")
+        );
+
+        function filterBookings() {
+            const query = searchInput.value
+                .trim()
+                .toLocaleLowerCase();
+
+            let matchCount = 0;
+
+            rows.forEach(function (row) {
+                /*
+                 * Search across vehicle, service, date, time,
+                 * amount, status and the Vehicle Removed indicator.
+                 */
+                const rowText = row.textContent
+                    .toLocaleLowerCase();
+
+                const matches = rowText.includes(query);
+
+                row.hidden = !matches;
+
+                if (matches) {
+                    matchCount++;
+                }
+            });
+
+            visibleCount.textContent = matchCount;
+
+            const hasQuery = query.length > 0;
+            const hasMatches = matchCount > 0;
+
+            noResults.hidden = !hasQuery || hasMatches;
+            bookingTable.hidden = !hasMatches;
+
+            searchStatus.textContent = hasQuery
+                ? (matchCount === 1
+                    ? "1 matching booking"
+                    : matchCount + " matching bookings")
+                : "";
+
+            clearButton.classList.toggle(
+                "visible",
+                hasQuery
+            );
+        }
+
+        searchInput.addEventListener("input", filterBookings);
+
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            filterBookings();
+            searchInput.focus();
+        });
+
+        if (resetLink) {
+            resetLink.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                searchInput.value = "";
+                filterBookings();
+                searchInput.focus();
+            });
+        }
+
+        filterBookings();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Book professional vehicle servicing online with AutoCare. Discover reliable vehicle maintenance, transparent pricing, and convenient service booking.">
+    <meta name="theme-color" content="#101b2d">
+
+    <title>AutoCare | Premium Vehicle Care</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+
+    <!-- AutoCare logo styling -->
+    <style>
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .brand-logo-image {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            font-size: 23px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1;
+            color: #101b2d;
+        }
+
+        .brand-accent {
+            color: #ef4136;
+        }
+
+        .footer-logo .brand-logo-image {
+            width: 48px;
+            height: 48px;
+        }
+
+        @media (max-width: 480px) {
+            .brand-logo-image {
+                width: 36px;
+                height: 36px;
+            }
+
+            .brand-text {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="nav-container">
+
+        <!-- Header logo -->
+        <a class="brand" th:href="@{/}" href="/" aria-label="AutoCare home">
+            <img class="brand-logo-image"
+                 th:src="@{/images/autocare-logo.png}"
+                 src="/images/autocare-logo.png"
+                 alt="AC Logo">
+            <span class="brand-text">Auto<span class="brand-accent">Care</span></span>
+        </a>
+
+        <nav class="nav" aria-label="Main navigation">
+            <a class="nav-link active" th:href="@{/}" href="/" aria-current="page">Home</a>
+            <a class="nav-link" th:href="@{/services}" href="/services">Services</a>
+            <a class="nav-link" th:href="@{/about}" href="/about">About Us</a>
+            <a class="nav-link" th:href="@{/contact}" href="/contact">Contact</a>
+            <a class="btn btn-outline" th:href="@{/login}" href="/login">Log In</a>
+            <a class="btn btn-primary" th:href="@{/register}" href="/register">Get Started</a>
+        </nav>
+
+    </div>
+</header>
+
+<main>
+
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-overlay" aria-hidden="true"></div>
+
+        <div class="hero-container">
+            <div class="hero-content">
+
+                <div class="eyebrow">
+                    <span class="eyebrow-line" aria-hidden="true"></span>
+                    PROFESSIONAL AUTOMOTIVE CARE
+                </div>
+
+                <h1 id="hero-title">
+                    Your Vehicle.<br>
+                    Our <span class="hero-highlight">Expertise.</span><br>
+                    Every Mile.
+                </h1>
+
+                <p class="hero-description">
+                    Keep your vehicle performing at its best with expert technicians,
+                    reliable servicing, and convenient online booking.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-primary btn-large"
+                       th:href="@{/customer/book-service}"
+                       href="/customer/book-service">
+                        Book Your Service
+                        <span class="button-arrow" aria-hidden="true">&rarr;</span>
+                    </a>
+
+                    <a class="btn btn-hero-secondary"
+                       th:href="@{/services}"
+                       href="/services">
+                        Explore Services
+                    </a>
+                </div>
+
+                <div class="hero-trust" aria-label="AutoCare benefits">
+                    <div class="trust-item">
+                        <strong>Expert</strong>
+                        <span>Technicians</span>
+                    </div>
+
+                    <div class="trust-divider" aria-hidden="true"></div>
+
+                    <div class="trust-item">
+                        <strong>Reliable</strong>
+                        <span>Vehicle Care</span>
+                    </div>
+
+                    <div class="trust-divider" aria-hidden="true"></div>
+
+                    <div class="trust-item">
+                        <strong>Simple</strong>
+                        <span>Online Booking</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="hero-bottom-label">
+            <span class="hero-bottom-dot" aria-hidden="true"></span>
+            COMPLETE VEHICLE CARE, ALL IN ONE PLACE
+        </div>
+    </section>
+
+    <section class="benefits-strip" aria-label="Our advantages">
+
+        <div class="benefit">
+            <span class="benefit-number">01</span>
+            <div>
+                <strong>Expert Technicians</strong>
+                <p>Professional vehicle maintenance</p>
+            </div>
+        </div>
+
+        <div class="benefit">
+            <span class="benefit-number">02</span>
+            <div>
+                <strong>Transparent Pricing</strong>
+                <p>Clear service costs</p>
+            </div>
+        </div>
+
+        <div class="benefit">
+            <span class="benefit-number">03</span>
+            <div>
+                <strong>Convenient Booking</strong>
+                <p>Book your service online</p>
+            </div>
+        </div>
+
+        <div class="benefit">
+            <span class="benefit-number">04</span>
+            <div>
+                <strong>Service Tracking</strong>
+                <p>Keep track of your bookings</p>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="section services-section" aria-labelledby="services-title">
+
+        <div class="section-heading">
+            <div>
+                <div class="section-eyebrow">WHAT WE OFFER</div>
+                <h2 id="services-title">Service that keeps<br>you moving.</h2>
+            </div>
+
+            <div class="section-heading-right">
+                <p>
+                    From routine maintenance to essential repairs, find the right care for your vehicle.
+                </p>
+
+                <a th:href="@{/services}" href="/services" class="text-link">
+                    Explore All Services <span aria-hidden="true">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="service-grid">
+
+            <article class="service-card">
+                <div class="service-image-wrap">
+                    <img src="/images/general-car-service.png"
+                         alt="Vehicle undergoing general maintenance"
+                         class="service-image"
+                         loading="lazy">
+                    <span class="service-number">01</span>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-category">MAINTENANCE</div>
+                    <h3>General Service</h3>
+                    <p>
+                        Comprehensive vehicle inspection and routine maintenance to keep your vehicle running smoothly.
+                    </p>
+
+                    <div class="service-card-bottom">
+                        <span class="service-price">From <strong>₹1,500</strong></span>
+                        <a class="service-arrow"
+                           th:href="@{/customer/book-service}"
+                           href="/customer/book-service"
+                           aria-label="Book general service">&rarr;</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="service-card">
+                <div class="service-image-wrap">
+                    <img src="/images/oil-change-service.png"
+                         alt="Engine oil being drained during an oil change"
+                         class="service-image"
+                         loading="lazy">
+                    <span class="service-number">02</span>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-category">ENGINE CARE</div>
+                    <h3>Oil Change</h3>
+                    <p>
+                        Engine oil and filter replacement designed to support smoother engine performance.
+                    </p>
+
+                    <div class="service-card-bottom">
+                        <span class="service-price">From <strong>₹800</strong></span>
+                        <a class="service-arrow"
+                           th:href="@{/customer/book-service}"
+                           href="/customer/book-service"
+                           aria-label="Book oil change">&rarr;</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="service-card">
+                <div class="service-image-wrap">
+                    <img src="/images/brake-repair.png"
+                         alt="Close-up of a vehicle brake disc and caliper"
+                         class="service-image"
+                         loading="lazy">
+                    <span class="service-number">03</span>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-category">SAFETY</div>
+                    <h3>Brake Service</h3>
+                    <p>
+                        Brake inspections and maintenance to help maintain reliable stopping performance.
+                    </p>
+
+                    <div class="service-card-bottom">
+                        <span class="service-price">From <strong>₹1,200</strong></span>
+                        <a class="service-arrow"
+                           th:href="@{/customer/book-service}"
+                           href="/customer/book-service"
+                           aria-label="Book brake service">&rarr;</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="service-card">
+                <div class="service-image-wrap">
+                    <img src="/images/tyre-wheel-alignment.png"
+                         alt="Vehicle tyre on a wheel alignment machine"
+                         class="service-image"
+                         loading="lazy">
+                    <span class="service-number">04</span>
+                </div>
+
+                <div class="service-body">
+                    <div class="service-category">ROAD READINESS</div>
+                    <h3>Tyre Service</h3>
+                    <p>
+                        Tyre inspections, wheel balancing, and alignment to support safer and more comfortable driving.
+                    </p>
+
+                    <div class="service-card-bottom">
+                        <span class="service-price">From <strong>₹800</strong></span>
+                        <a class="service-arrow"
+                           th:href="@{/customer/book-service}"
+                           href="/customer/book-service"
+                           aria-label="Book tyre service">&rarr;</a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <div class="services-footer">
+            <p>Looking for something else? Explore additional vehicle care options.</p>
+
+            <a class="btn btn-dark" th:href="@{/services}" href="/services">
+                View All Services <span aria-hidden="true">&rarr;</span>
+            </a>
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+
+    <div class="footer-main">
+
+        <div class="footer-brand">
+
+            <!-- Footer logo -->
+            <a class="brand footer-logo"
+               th:href="@{/}"
+               href="/"
+               aria-label="AutoCare home">
+                <img class="brand-logo-image"
+                     th:src="@{/images/autocare-logo.png}"
+                     src="/images/autocare-logo.png"
+                     alt="AC Logo">
+                <span class="brand-text">Auto<span class="brand-accent">Care</span></span>
+            </a>
+
+            <p>
+                Professional vehicle care, convenient booking, and a better way to manage your vehicle servicing.
+            </p>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a th:href="@{/}" href="/">Home</a>
+            <a th:href="@{/services}" href="/services">Our Services</a>
+            <a th:href="@{/about}" href="/about">About AutoCare</a>
+            <a th:href="@{/contact}" href="/contact">Contact</a>
+        </div>
+
+        <div class="footer-column">
+            <h3>Customer</h3>
+            <a th:href="@{/login}" href="/login">Log In</a>
+            <a th:href="@{/register}" href="/register">Create Account</a>
+            <a th:href="@{/customer/book-service}" href="/customer/book-service">Book Service</a>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <span>
+            &copy;
+            <span th:text="${#dates.year(#dates.createNow())}">2026</span>
+            AutoCare. All rights reserved.
+        </span>
+        <span>Vehicle Service Management System</span>
+    </div>
+
+</footer>
+
+</body>
+</html>

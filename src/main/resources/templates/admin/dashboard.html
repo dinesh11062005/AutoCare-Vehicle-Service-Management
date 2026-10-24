@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Admin Dashboard | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        /* Dashboard-specific layout */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 245px minmax(0, 1fr);
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .dashboard-layout .main {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .dashboard-content {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .dashboard-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .dashboard-heading h1 {
+            margin: 0 0 6px;
+            font-size: 26px;
+        }
+
+        .dashboard-heading p {
+            margin: 0;
+            opacity: 0.7;
+        }
+
+        .dashboard-heading .btn {
+            white-space: nowrap;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-stat {
+            padding: 22px;
+            min-width: 0;
+            border-radius: 12px;
+        }
+
+        .dashboard-stat-label {
+            font-size: 14px;
+            opacity: 0.75;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-stat-value {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .dashboard-stat-note {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        .dashboard-section {
+            margin-bottom: 24px;
+            min-width: 0;
+        }
+
+        .dashboard-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-section-header h2 {
+            font-size: 19px;
+            margin: 0;
+        }
+
+        .dashboard-section-header a {
+            text-decoration: none;
+        }
+
+        .status-overview {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .status-overview-item {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .status-overview-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .status-overview-count {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-right: 7px;
+        }
+
+        .indicator-pending {
+            background: #f59e0b;
+        }
+
+        .indicator-progress {
+            background: #3b82f6;
+        }
+
+        .indicator-completed {
+            background: #16a34a;
+        }
+
+        .indicator-cancelled {
+            background: #ef4444;
+        }
+
+        .recent-bookings-panel {
+            padding: 22px;
+            min-width: 0;
+            border-radius: 12px;
+        }
+
+        .dashboard-table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .dashboard-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+        }
+
+        .dashboard-table td {
+            font-size: 13px;
+        }
+
+        .dashboard-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dashboard-status-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-status-select {
+            min-width: 125px;
+            max-width: 145px;
+        }
+
+        .dashboard-update-button {
+            flex-shrink: 0;
+        }
+
+        .dashboard-empty {
+            padding: 28px 12px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .dashboard-footer-action {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+        }
+
+        .dashboard-footer-action a {
+            text-decoration: none;
+        }
+
+        .dashboard-quick-note {
+            padding: 18px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #fff;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-quick-note h2 {
+            margin: 0 0 8px;
+            font-size: 17px;
+        }
+
+        .dashboard-quick-note p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .status-overview {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .dashboard-content {
+                padding: 18px;
+            }
+
+            .dashboard-heading h1 {
+                font-size: 22px;
+            }
+
+            .recent-bookings-panel {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-stats,
+            .status-overview {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .dashboard-content {
+                padding: 14px;
+            }
+
+            .dashboard-heading .btn {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
+        }
+		
+		/* Keep the sidebar full-height */
+		.dashboard-layout {
+		    min-height: 100vh;
+		    align-items: stretch;
+		}
+
+		.dashboard-layout .sidebar {
+		    min-height: 100vh;
+		    height: 100%;
+		}
+
+		/* Reduce dashboard spacing */
+		.dashboard-content {
+		    padding: 16px 20px;
+		}
+
+		.dashboard-heading {
+		    margin-bottom: 14px;
+		}
+
+		.dashboard-stats {
+		    gap: 12px;
+		    margin-bottom: 16px;
+		}
+
+		.dashboard-stat {
+		    padding: 16px;
+		}
+
+		.dashboard-stat-value {
+		    font-size: 26px;
+		}
+
+		.dashboard-section {
+		    margin-bottom: 16px;
+		}
+
+		.status-overview {
+		    gap: 10px;
+		}
+
+		.status-overview-item {
+		    padding: 12px 16px;
+		}
+
+		.recent-bookings-panel {
+		    padding: 16px;
+		}
+
+		.dashboard-table th,
+		.dashboard-table td {
+		    padding: 10px 8px;
+		}
+
+		/* Avoid horizontal scrolling across the whole page */
+		html,
+		body {
+		    margin: 0;
+		    width: 100%;
+		    overflow-x: hidden;
+		}
+
+		.dashboard-layout .main {
+		    min-width: 0;
+		    overflow-x: hidden;
+		}
+
+		/* Responsive layout */
+		@media (max-width: 800px) {
+		    .dashboard-layout .sidebar {
+		        min-height: auto;
+		        height: auto;
+		    }
+		}
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+		<div class="side-brand">
+		    <img th:src="@{/images/autocare-logo.png}" alt="AutoCare">
+		    <span class="brand-name">
+		        Auto<span class="brand-highlight">Care</span>
+		    </span>
+		</div>
+        <a class="side-link active" th:href="@{/admin/dashboard}">
+            Dashboard
+        </a>
+
+        <a class="side-link" th:href="@{/admin/service-requests}">
+            Service Requests
+        </a>
+
+        <a class="side-link" th:href="@{/admin/work-in-progress}">
+            Work in Progress
+        </a>
+
+        <a class="side-link" th:href="@{/admin/completed}">
+            Completed
+        </a>
+
+        <a class="side-link" th:href="@{/admin/customers}">
+            Customers
+        </a>
+
+        <a class="side-link" th:href="@{/admin/vehicles}">
+            Vehicles
+        </a>
+
+        <a class="side-link" th:href="@{/admin/payments}">
+            Payments
+        </a>
+
+        <a class="side-link" th:href="@{/admin/reports}">
+            Reports
+        </a>
+
+        <a class="side-link" th:href="@{/}">
+            Home
+        </a>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <header class="page-head">
+            <strong>Service Center Dashboard</strong>
+            <span>Service Manager</span>
+        </header>
+
+        <div class="dashboard-content">
+
+            <!-- Heading -->
+            <section class="dashboard-heading">
+
+                <div>
+                    <h1>Dashboard Overview</h1>
+                    <p>Monitor service requests and daily operations.</p>
+                </div>
+
+                <a class="btn btn-light"
+                   th:href="@{/admin/service-requests}">
+                    View All Requests
+                </a>
+
+            </section>
+
+            <!-- Summary Cards -->
+            <section class="dashboard-stats">
+
+                <div class="card dashboard-stat">
+                    <div class="dashboard-stat-label">
+                        Total Bookings
+                    </div>
+
+                    <div class="dashboard-stat-value"
+                         th:text="${totalBookings}">
+                        0
+                    </div>
+
+                    <div class="dashboard-stat-note">
+                        All service bookings
+                    </div>
+                </div>
+
+                <div class="card dashboard-stat">
+                    <div class="dashboard-stat-label">
+                        Pending Requests
+                    </div>
+
+                    <div class="dashboard-stat-value"
+                         th:text="${pendingCount}">
+                        0
+                    </div>
+
+                    <div class="dashboard-stat-note">
+                        Awaiting service
+                    </div>
+                </div>
+
+                <div class="card dashboard-stat">
+                    <div class="dashboard-stat-label">
+                        Work in Progress
+                    </div>
+
+                    <div class="dashboard-stat-value"
+                         th:text="${inProgressCount}">
+                        0
+                    </div>
+
+                    <div class="dashboard-stat-note">
+                        Currently being serviced
+                    </div>
+                </div>
+
+                <div class="card dashboard-stat">
+                    <div class="dashboard-stat-label">
+                        Completed Services
+                    </div>
+
+                    <div class="dashboard-stat-value"
+                         th:text="${completedCount}">
+                        0
+                    </div>
+
+                    <div class="dashboard-stat-note">
+                        Finished service bookings
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Booking Status Overview -->
+            <section class="dashboard-section">
+
+                <div class="dashboard-section-header">
+                    <h2>Booking Status Overview</h2>
+                </div>
+
+                <div class="status-overview">
+
+                    <div class="status-overview-item">
+                        <div class="status-overview-label">
+                            <span class="status-indicator indicator-pending"></span>
+                            Pending
+                        </div>
+
+                        <div class="status-overview-count"
+                             th:text="${pendingCount}">
+                            0
+                        </div>
+                    </div>
+
+                    <div class="status-overview-item">
+                        <div class="status-overview-label">
+                            <span class="status-indicator indicator-progress"></span>
+                            In Progress
+                        </div>
+
+                        <div class="status-overview-count"
+                             th:text="${inProgressCount}">
+                            0
+                        </div>
+                    </div>
+
+                    <div class="status-overview-item">
+                        <div class="status-overview-label">
+                            <span class="status-indicator indicator-completed"></span>
+                            Completed
+                        </div>
+
+                        <div class="status-overview-count"
+                             th:text="${completedCount}">
+                            0
+                        </div>
+                    </div>
+
+                    <div class="status-overview-item">
+                        <div class="status-overview-label">
+                            <span class="status-indicator indicator-cancelled"></span>
+                            Cancelled
+                        </div>
+
+                        <div class="status-overview-count"
+                             th:text="${cancelledCount}">
+                            0
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Pending Actions -->
+            <section class="dashboard-quick-note"
+                     th:if="${pendingCount > 0}">
+
+                <h2>Pending Actions</h2>
+
+                <p>
+                    There are
+                    <strong th:text="${pendingCount}">0</strong>
+                    pending service request(s) that may need attention.
+                    Review them on the Service Requests page.
+                </p>
+
+                <div style="margin-top: 14px;">
+                    <a class="btn btn-light"
+                       th:href="@{/admin/service-requests}">
+                        Review Pending Requests
+                    </a>
+                </div>
+
+            </section>
+
+            <!-- Recent Bookings -->
+            <section class="card recent-bookings-panel dashboard-section">
+
+                <div class="dashboard-section-header">
+                    <h2>Recent Bookings</h2>
+
+                    <span style="font-size: 13px; color: #6b7280;">
+                        Latest 5 records
+                    </span>
+                </div>
+
+                <div class="dashboard-table-container">
+
+                    <table class="dashboard-table">
+
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                                <th>Service</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="b : ${recentBookings}">
+
+                                <td th:text="${b.id}">1</td>
+
+                                <td th:text="${b.customer.name}">
+                                    Customer Name
+                                </td>
+
+                                <td th:text="${b.vehicle.make + ' ' + b.vehicle.model}">
+                                    Vehicle
+                                </td>
+
+                                <td th:text="${b.service.name}">
+                                    Service
+                                </td>
+
+                                <td th:text="${b.serviceDate}">
+                                    Date
+                                </td>
+
+                                <td th:text="${b.serviceTime}">
+                                    Time
+                                </td>
+
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${b.status.name() == 'COMPLETED' ? ' completed' : (b.status.name() == 'IN_PROGRESS' ? ' progress' : (b.status.name() == 'CANCELLED' ? ' cancelled' : ' pending'))}"
+                                          th:text="${b.status.name()}">
+                                        PENDING
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <form method="post"
+                                          th:action="@{/admin/booking/{id}/status(id=${b.id})}"
+                                          class="dashboard-status-form">
+
+                                        <select name="value"
+                                                class="select dashboard-status-select"
+                                                aria-label="Update booking status">
+
+                                            <option
+                                                th:each="status : ${T(com.autocare.vehicleservice.entity.Booking.BookingStatus).values()}"
+                                                th:value="${status.name()}"
+                                                th:text="${status.name()}"
+                                                th:selected="${status.name() == b.status.name()}">
+                                            </option>
+
+                                        </select>
+
+                                        <button type="submit"
+                                                class="btn btn-light dashboard-update-button">
+                                            Update
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="dashboard-empty"
+                     th:if="${#lists.isEmpty(recentBookings)}">
+                    No bookings found. New customer bookings will appear here.
+                </div>
+
+                <div class="dashboard-footer-action">
+                    <a class="btn btn-light"
+                       th:href="@{/admin/service-requests}">
+                        View All Service Requests
+                    </a>
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

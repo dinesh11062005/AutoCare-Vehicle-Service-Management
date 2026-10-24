@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${editMode} ? 'Edit Vehicle | AutoCare' : 'Add Vehicle | AutoCare'">
+        Add Vehicle | AutoCare
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Page layout */
+        .dashboard-layout {
+            min-height: 100vh;
+        }
+
+        .main {
+            min-width: 0;
+            width: auto;
+        }
+
+        .page-head {
+            width: 100%;
+        }
+
+        .content {
+            width: 100%;
+            max-width: none;
+            padding: 24px 30px;
+        }
+
+        .vehicle-form-card {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        /* Form fields */
+        .vehicle-form-card .two-col {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .vehicle-form-card .form-group {
+            min-width: 0;
+            margin-bottom: 16px;
+        }
+
+        .vehicle-form-card label {
+            display: block;
+            margin-bottom: 8px;
+            color: #172b4d;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .vehicle-form-card .input,
+        .vehicle-form-card .select {
+            display: block;
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 13px;
+            border: 1px solid #dbe3ef;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #172b4d;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .vehicle-form-card .input:focus,
+        .vehicle-form-card .select:focus {
+            outline: none;
+            border-color: #e9433e;
+            box-shadow: 0 0 0 3px rgba(233, 67, 62, 0.10);
+        }
+
+        .vehicle-form-card .input::placeholder {
+            color: #9aa8bd;
+        }
+
+        .field-help {
+            display: block;
+            margin-top: 7px;
+            color: #718096;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* Vehicle photo section */
+        .vehicle-upload-section {
+            margin-top: 8px;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .vehicle-upload-section h3 {
+            margin: 0 0 6px;
+            color: #10213d;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .upload-description {
+            margin: 0 0 16px;
+            color: #718096;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .vehicle-preview-frame {
+            width: 100%;
+            max-width: 420px;
+            height: 180px;
+            margin: 0 0 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .vehicle-preview-frame[hidden] {
+            display: none !important;
+        }
+
+        .vehicle-image-preview {
+            display: block;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+            object-fit: contain;
+        }
+
+        .vehicle-file-input {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            padding: 9px;
+            border: 1px solid #d7e0ec;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #52637a;
+            font-size: 13px;
+        }
+
+        .vehicle-file-input::file-selector-button {
+            margin-right: 12px;
+            padding: 9px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #10213d;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .vehicle-file-input::file-selector-button:hover {
+            background: #233c61;
+        }
+
+        .upload-note {
+            display: block;
+            margin-top: 10px;
+            color: #7a879a;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 12px;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #edf0f5;
+        }
+
+        .form-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 160px;
+            width: 160px;
+            min-width: 160px;
+            height: 44px;
+            min-height: 44px;
+            margin: 0;
+            padding: 0 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 650;
+            line-height: 1.2;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Error message */
+        .error-message {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #991b1b;
+            font-size: 13px;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 900px) {
+            .content {
+                padding: 20px;
+            }
+
+            .vehicle-form-card {
+                padding: 20px;
+            }
+
+            .vehicle-form-card .two-col {
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 12px;
+            }
+
+            .vehicle-form-card {
+                padding: 16px;
+                border-radius: 11px;
+            }
+
+            .vehicle-form-card .two-col {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 0;
+            }
+
+            .vehicle-upload-section {
+                padding: 14px;
+            }
+
+            .vehicle-preview-frame {
+                max-width: 100%;
+                height: 160px;
+            }
+
+            .vehicle-file-input {
+                max-width: 100%;
+            }
+
+            .form-actions {
+                gap: 10px;
+            }
+
+            .form-actions .btn {
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- Existing customer sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar('vehicles')}"></div>
+
+    <main class="main">
+
+        <header class="page-head">
+            <strong th:text="${editMode} ? 'Edit Vehicle' : 'Add Vehicle'">
+                Add Vehicle
+            </strong>
+        </header>
+
+        <div class="content">
+
+            <div class="card panel vehicle-form-card">
+
+                <!-- Error message -->
+                <div th:if="${errorMessage}"
+                     class="error-message"
+                     th:text="${errorMessage}">
+                </div>
+
+                <form method="post"
+                      th:action="${editMode}
+                          ? @{/customer/vehicles/update/{id}(id=${vehicle.id})}
+                          : @{/customer/vehicles/save}"
+                      th:object="${vehicle}"
+                      enctype="multipart/form-data">
+
+                    <!-- Vehicle details -->
+                    <div class="two-col">
+
+                        <div>
+                            <div class="form-group">
+                                <label for="make">Make</label>
+
+                                <input class="input"
+                                       id="make"
+                                       type="text"
+                                       th:field="*{make}"
+                                       placeholder="e.g. Toyota"
+                                       maxlength="100"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="model">Model</label>
+
+                                <input class="input"
+                                       id="model"
+                                       type="text"
+                                       th:field="*{model}"
+                                       placeholder="e.g. Innova Crysta"
+                                       maxlength="100"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="registrationNumber">
+                                    Registration Number
+                                </label>
+
+                                <input class="input"
+                                       id="registrationNumber"
+                                       type="text"
+                                       th:field="*{registrationNumber}"
+                                       placeholder="e.g. TN01AB1234"
+                                       maxlength="50"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="form-group">
+                                <label for="vehicleType">Vehicle Type</label>
+
+                                <select class="select"
+                                        id="vehicleType"
+                                        th:field="*{vehicleType}">
+                                    <option value="Car">Car</option>
+                                    <option value="Bike">Bike</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Commercial">Commercial</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="year">Manufacturing Year</label>
+
+                                <input class="input"
+                                       id="year"
+                                       type="number"
+                                       th:field="*{year}"
+                                       min="1900"
+                                       max="2100"
+                                       placeholder="e.g. 2024">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="mileage">Odometer Reading (km)</label>
+
+                                <input class="input"
+                                       id="mileage"
+                                       type="number"
+                                       th:field="*{mileage}"
+                                       min="0"
+                                       step="1"
+                                       placeholder="e.g. 45000"
+                                       aria-describedby="mileageHelp">
+
+                                <small class="field-help" id="mileageHelp">
+                                    Enter the total distance your vehicle has
+                                    travelled, in kilometres.
+                                </small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Vehicle photo upload -->
+                    <section class="vehicle-upload-section">
+
+                        <h3>Vehicle Photo</h3>
+
+                        <p class="upload-description"
+                           th:text="${editMode}
+                               ? 'Choose a new image to replace the current vehicle photo. Leave empty to keep the current photo.'
+                               : 'Upload a photo of your vehicle to display it on your vehicle card.'">
+                            Upload a photo of your vehicle.
+                        </p>
+
+                        <!-- Existing image appears only when editing a vehicle
+                             that already has a saved photo. -->
+                        <div class="vehicle-preview-frame"
+                             id="vehiclePreviewFrame"
+                             th:hidden="${!editMode or vehicle.image == null or vehicle.image.isEmpty()}">
+
+                            <img id="vehicleImagePreview"
+                                 class="vehicle-image-preview"
+                                 th:if="${editMode and vehicle.image != null and !vehicle.image.isEmpty()}"
+                                 th:src="@{/uploads/vehicles/{filename}(filename=${vehicle.image})}"
+                                 alt="Vehicle photo"
+                                 onerror="this.closest('.vehicle-preview-frame').hidden = true;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="vehicleImage">
+                                Choose Vehicle Image
+                            </label>
+
+                            <input class="vehicle-file-input"
+                                   id="vehicleImage"
+                                   name="vehicleImage"
+                                   type="file"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   th:required="${!editMode}">
+                        </div>
+
+                        <small class="upload-note">
+                            Supported formats: JPG, PNG or WEBP.
+                            Maximum file size: 5 MB.
+                        </small>
+
+                    </section>
+
+                    <!-- Equal-sized buttons -->
+                    <div class="form-actions">
+
+                        <button class="btn btn-primary"
+                                type="submit"
+                                th:text="${editMode} ? 'Update Vehicle' : 'Save Vehicle'">
+                            Save Vehicle
+                        </button>
+
+                        <a class="btn btn-outline"
+                           th:href="@{/customer/vehicles}">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    const vehicleImageInput =
+        document.getElementById("vehicleImage");
+
+    const vehiclePreviewFrame =
+        document.getElementById("vehiclePreviewFrame");
+
+    let currentPreviewUrl = null;
+
+    vehicleImageInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        const maxSize = 5 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Please select a JPG, PNG, or WEBP image.");
+            this.value = "";
+            return;
+        }
+
+        if (file.size > maxSize) {
+            alert("The image must be 5 MB or smaller.");
+            this.value = "";
+            return;
+        }
+
+        if (currentPreviewUrl) {
+            URL.revokeObjectURL(currentPreviewUrl);
+            currentPreviewUrl = null;
+        }
+
+        currentPreviewUrl = URL.createObjectURL(file);
+
+        let previewImage =
+            document.getElementById("vehicleImagePreview");
+
+        if (!previewImage) {
+            previewImage = document.createElement("img");
+            previewImage.id = "vehicleImagePreview";
+            previewImage.className = "vehicle-image-preview";
+            previewImage.alt = "Selected vehicle photo";
+
+            vehiclePreviewFrame.appendChild(previewImage);
+        }
+
+        previewImage.onerror = function () {
+            vehiclePreviewFrame.hidden = true;
+            alert("The selected image could not be displayed. Please choose another image.");
+        };
+
+        previewImage.onload = function () {
+            vehiclePreviewFrame.hidden = false;
+        };
+
+        previewImage.src = currentPreviewUrl;
+        vehiclePreviewFrame.hidden = false;
+    });
+
+    window.addEventListener("beforeunload", function () {
+        if (currentPreviewUrl) {
+            URL.revokeObjectURL(currentPreviewUrl);
+        }
+    });
+</script>
+
+</body>
+</html>

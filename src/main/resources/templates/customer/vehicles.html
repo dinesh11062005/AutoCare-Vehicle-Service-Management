@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Vehicles | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+            gap: 22px;
+        }
+
+        .vehicle-card {
+            overflow: hidden;
+            padding: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.09);
+        }
+
+        .vehicle-image {
+            display: block;
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .vehicle-meta {
+            padding: 18px;
+        }
+
+        .vehicle-meta h3 {
+            margin: 0 0 10px;
+            color: #0f172a;
+            font-size: 17px;
+        }
+
+        .vehicle-meta p {
+            margin: 7px 0;
+            color: #64748b;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .vehicle-type {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 5px 9px;
+            border-radius: 6px;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .vehicle-actions {
+            display: flex;
+            gap: 10px;
+            padding: 0 18px 18px;
+        }
+
+        .vehicle-actions .btn {
+            flex: 1;
+            text-align: center;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .btn-delete {
+            background: #ffffff;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+            border-color: #dc2626;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .vehicle-empty {
+            padding: 35px;
+            text-align: center;
+        }
+
+        .vehicle-empty h3 {
+            margin-top: 0;
+            color: #0f172a;
+        }
+
+        .vehicle-empty p {
+            margin-bottom: 20px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .vehicle-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vehicle-image {
+                height: 210px;
+            }
+
+            .vehicle-actions {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <div th:replace="~{fragments/sidebar :: sidebar('vehicles')}"></div>
+
+        <main class="main">
+
+            <header class="page-head">
+                <strong>My Vehicles</strong>
+
+                <a class="btn btn-primary"
+                   th:href="@{/customer/vehicles/add}">
+                    Add New Vehicle
+                </a>
+            </header>
+
+            <div class="content">
+
+                <!-- Success message -->
+                <div th:if="${successMessage}"
+                     class="message success-message"
+                     th:text="${successMessage}">
+                </div>
+
+                <!-- Error message -->
+                <div th:if="${errorMessage}"
+                     class="message error-message"
+                     th:text="${errorMessage}">
+                </div>
+
+                <!-- Vehicle cards -->
+                <div class="vehicle-grid"
+                     th:if="${vehicles != null and !vehicles.isEmpty()}">
+
+                    <article class="card vehicle-card"
+                             th:each="v : ${vehicles}">
+
+                        <img class="vehicle-image"
+                             th:src="${v.image != null and !v.image.isBlank()}
+                                 ? @{/uploads/vehicles/{filename}(filename=${v.image})}
+                                 : @{/images/car.svg}"
+                             th:alt="${v.make + ' ' + v.model}"
+                             onerror="this.onerror=null;this.src='/images/car.svg';">
+
+                        <div class="vehicle-meta">
+
+                            <h3 th:text="${v.make + ' ' + v.model}">
+                                Toyota Innova
+                            </h3>
+
+                            <p>
+                                Registration:
+                                <strong th:text="${v.registrationNumber}">
+                                    TN01AB1234
+                                </strong>
+                            </p>
+
+							<span class="vehicle-type"
+							      th:text="${v.vehicleType != null and !v.vehicleType.isBlank()
+							          ? v.vehicleType
+							          : 'Vehicle'}">
+							    Car
+							</span>
+
+                            <p>
+                                Year:
+                                <span th:text="${v.year != null ? v.year : 'Not specified'}">
+                                    2024
+                                </span>
+                            </p>
+
+                            <p>
+                                Mileage:
+                                <span th:text="${v.mileage != null ? v.mileage + ' km' : 'Not specified'}">
+                                    25000 km
+                                </span>
+                            </p>
+
+                        </div>
+
+                        <!-- Edit and Delete actions -->
+                        <div class="vehicle-actions">
+
+                            <a class="btn btn-primary"
+                               th:href="@{/customer/vehicles/edit/{id}(id=${v.id})}">
+                                Edit
+                            </a>
+
+                            <form method="post"
+                                  th:action="@{/customer/vehicles/delete/{id}(id=${v.id})}"
+                                  style="flex: 1; margin: 0;"
+                                  onsubmit="return confirm('Are you sure you want to delete this vehicle? Vehicles with booking history cannot be deleted.');">
+
+                                <button type="submit"
+                                        class="btn btn-delete"
+                                        style="width: 100%;">
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+                <!-- Empty state -->
+                <div class="card vehicle-empty"
+                     th:if="${vehicles == null or vehicles.isEmpty()}">
+
+                    <h3>No Vehicles Added</h3>
+
+                    <p>
+                        Add your first vehicle and upload its photo.
+                    </p>
+
+                    <a class="btn btn-primary"
+                       th:href="@{/customer/vehicles/add}">
+                        Add Your First Vehicle
+                    </a>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service History | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .history-container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 26px 30px;
+        }
+
+        .history-intro {
+            margin-bottom: 22px;
+        }
+
+        .history-intro p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Search bar */
+        .history-search-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 0 auto 24px;
+        }
+
+        .history-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 680px;
+            min-height: 50px;
+            padding: 6px 8px 6px 16px;
+            border: 1px solid #dbe3ed;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .history-search:focus-within {
+            border-color: #e9423a;
+            box-shadow: 0 0 0 3px rgba(233, 66, 58, 0.09);
+        }
+
+        .search-icon {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            color: #8492a6;
+        }
+
+        .search-icon svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .history-search input {
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+            height: 36px;
+            padding: 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #172b4d;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .history-search input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-clear {
+            display: none;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 19px;
+            cursor: pointer;
+        }
+
+        .search-clear:hover {
+            background: #e2e8f0;
+        }
+
+        .search-clear.visible {
+            display: inline-flex;
+        }
+
+        .history-search-hint {
+            margin: -14px 0 22px;
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* Result count */
+        .history-results {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .history-results strong {
+            color: #334155;
+        }
+
+        /* Table container */
+        .history-card {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e4e8ef;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .history-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            padding: 15px 12px;
+            background: #f5f7fa;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .history-table td {
+            padding: 17px 12px;
+            border-bottom: 1px solid #edf0f4;
+            color: #475569;
+            font-size: 13px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tbody tr:hover {
+            background: #fafbfd;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .view-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            min-height: 38px;
+            padding: 8px 14px;
+            border-radius: 7px;
+            background: #edf2f7;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .view-button:hover {
+            background: #dfe7f0;
+        }
+
+        /* Empty and no-match states */
+        .empty-state {
+            padding: 42px 20px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            color: #172b4d;
+            font-size: 18px;
+        }
+
+        .empty-state p {
+            margin: 0 0 16px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .empty-state a {
+            color: #e9423a;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .empty-state a:hover {
+            text-decoration: underline;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .history-container {
+                padding: 18px 14px;
+            }
+
+            .history-search {
+                max-width: 100%;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 13px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .history-container {
+                padding: 14px 10px;
+            }
+
+            .history-search-wrapper {
+                margin-bottom: 22px;
+            }
+
+            .history-search {
+                min-height: 46px;
+            }
+
+            .history-search-hint {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- Existing sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar('service-history')}"></div>
+
+    <main class="main">
+
+        <header class="page-head">
+            <strong>Service History</strong>
+
+            <a th:href="@{/customer/book-service}"
+               class="btn btn-primary">
+                Book Service
+            </a>
+        </header>
+
+        <div class="content">
+
+            <div class="history-container">
+
+                <div class="history-intro">
+                    <p>View your completed vehicle services and access their invoices.</p>
+                </div>
+
+                <!-- Centered search bar -->
+                <div class="history-search-wrapper"
+                     th:if="${bookings != null and !bookings.isEmpty()}">
+
+                    <div class="history-search">
+
+                        <span class="search-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <path d="m16 16 4 4"></path>
+                            </svg>
+                        </span>
+
+                        <input type="search"
+                               id="historySearchInput"
+                               placeholder="Search vehicle, service, date, time, amount or status..."
+                               aria-label="Search service history"
+                               autocomplete="off">
+
+                        <button type="button"
+                                id="clearHistorySearch"
+                                class="search-clear"
+                                aria-label="Clear search"
+                                title="Clear search">
+                            &times;
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <p class="history-search-hint"
+                   th:if="${bookings != null and !bookings.isEmpty()}">
+                    Search by vehicle name, service type, date, time, amount or status.
+                </p>
+
+                <!-- Search results count -->
+                <div class="history-results"
+                     id="historyResults"
+                     th:if="${bookings != null and !bookings.isEmpty()}">
+
+                    <span>
+                        Services found:
+                        <strong id="visibleCount"
+                                th:text="${bookings.size()}">0</strong>
+                    </span>
+
+                    <span id="searchStatus" aria-live="polite"></span>
+
+                </div>
+
+                <!-- Service history table -->
+                <div class="history-card">
+
+                    <table class="history-table"
+                           id="historyTable"
+                           th:if="${bookings != null and !bookings.isEmpty()}">
+
+                        <thead>
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Invoice</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="historyTableBody">
+
+                        <tr th:each="booking : ${bookings}"
+                            class="history-row">
+
+                            <td>
+                                <span th:text="${booking.vehicle.make + ' ' + booking.vehicle.model}">
+                                    Vehicle
+                                </span>
+                            </td>
+
+                            <td th:text="${booking.service.name}">
+                                Service
+                            </td>
+
+                            <td th:text="${booking.serviceDate}">
+                                2026-10-20
+                            </td>
+
+                            <td th:text="${booking.serviceTime}">
+                                09:00
+                            </td>
+
+                            <td>
+                                ₹<span th:text="${booking.estimatedAmount}">
+                                    0.00
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-badge"
+                                      th:text="${booking.status}">
+                                    COMPLETED
+                                </span>
+                            </td>
+
+                            <td>
+                                <a class="view-button"
+                                   th:href="@{/customer/invoice/{id}(id=${booking.id})}">
+                                    View
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                    <!-- No services in the database -->
+                    <div class="empty-state"
+                         id="noHistoryState"
+                         th:if="${bookings == null or bookings.isEmpty()}">
+
+                        <h3>No Service History</h3>
+
+                        <p>Your completed services will appear here.</p>
+
+                        <a th:href="@{/customer/book-service}">
+                            Book your first service
+                        </a>
+
+                    </div>
+
+                    <!-- No matching search results -->
+                    <div class="empty-state"
+                         id="noSearchResults"
+                         hidden>
+
+                        <h3>No Matching Services</h3>
+
+                        <p>
+                            No service history matches your search.
+                            Try a different vehicle, service or date.
+                        </p>
+
+                        <a href="#"
+                           id="resetHistorySearch">
+                            Clear search and show all services
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput =
+            document.getElementById("historySearchInput");
+
+        const clearButton =
+            document.getElementById("clearHistorySearch");
+
+        const resetLink =
+            document.getElementById("resetHistorySearch");
+
+        const tableBody =
+            document.getElementById("historyTableBody");
+
+        const visibleCount =
+            document.getElementById("visibleCount");
+
+        const searchStatus =
+            document.getElementById("searchStatus");
+
+        const noSearchResults =
+            document.getElementById("noSearchResults");
+
+        const historyTable =
+            document.getElementById("historyTable");
+
+        if (!searchInput || !tableBody) {
+            return;
+        }
+
+        const rows = Array.from(
+            tableBody.querySelectorAll(".history-row")
+        );
+
+        function filterHistory() {
+            const query = searchInput.value
+                .trim()
+                .toLocaleLowerCase();
+
+            let matchCount = 0;
+
+            rows.forEach(function (row) {
+                /*
+                 * Search across the displayed vehicle, service,
+                 * date, time, amount and status columns.
+                 */
+                const rowText = row.textContent
+                    .toLocaleLowerCase();
+
+                const matches = rowText.includes(query);
+
+                row.hidden = !matches;
+
+                if (matches) {
+                    matchCount++;
+                }
+            });
+
+            visibleCount.textContent = matchCount;
+
+            const hasQuery = query.length > 0;
+            const hasMatches = matchCount > 0;
+
+            noSearchResults.hidden = !hasQuery || hasMatches;
+            historyTable.hidden = !hasMatches;
+
+            searchStatus.textContent = hasQuery
+                ? (matchCount === 1
+                    ? "1 matching service"
+                    : matchCount + " matching services")
+                : "";
+
+            clearButton.classList.toggle(
+                "visible",
+                hasQuery
+            );
+        }
+
+        searchInput.addEventListener("input", filterHistory);
+
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            filterHistory();
+            searchInput.focus();
+        });
+
+        if (resetLink) {
+            resetLink.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                searchInput.value = "";
+                filterHistory();
+                searchInput.focus();
+            });
+        }
+
+        /*
+         * Start with all server-rendered rows visible.
+         * The original invoice links remain unchanged.
+         */
+        filterHistory();
+    });
+</script>
+
+</body>
+</html>

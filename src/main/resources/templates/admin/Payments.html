@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payments | AutoCare</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <style>
+        .payment-page{width:100%;min-width:0;box-sizing:border-box}
+        .payment-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+        .payment-heading h2{margin:0 0 8px}
+        .payment-heading p{margin:0;color:#64748b}
+        .payment-total{padding:14px 18px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;color:#64748b;font-size:13px}
+        .payment-total strong{margin-right:6px;color:#0f172a;font-size:22px}
+        .payment-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+        .payment-summary-item{padding:18px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
+        .payment-summary-label{margin-bottom:8px;color:#64748b;font-size:13px}
+        .payment-summary-value{color:#10223d;font-size:23px;font-weight:750}
+        .payment-panel{min-width:0;padding:24px}
+        .payment-panel-header{margin-bottom:18px}
+        .payment-panel-header h3{margin:0 0 8px;font-size:20px}
+        .payment-panel-header p{margin:0;color:#64748b;font-size:13px}
+        .payment-search-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+        .payment-search{width:100%;min-width:0;height:46px;flex:1;box-sizing:border-box;padding:0 15px;border:1px solid #dbe3ee;border-radius:9px;outline:none;background:#fff;color:#0f172a;font-family:inherit;font-size:13px}
+        .payment-search:focus{border-color:#64748b;box-shadow:0 0 0 3px rgba(100,116,139,.1)}
+        .payment-clear{height:46px;min-width:76px;padding:0 18px;border:0;border-radius:9px;background:#edf2f8;color:#0f172a;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+        .payment-results{margin-bottom:14px;color:#64748b;font-size:12px}
+        .payment-table-scroll{width:100%;overflow-x:auto;border:1px solid #e8edf4;border-radius:9px}
+        .payment-table{width:100%;border-collapse:collapse}
+        .payment-table th,.payment-table td{padding:15px 12px;border-bottom:1px solid #e8edf4;text-align:left;vertical-align:middle;font-size:12px}
+        .payment-table th{background:#f8fafc;color:#64748b;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.035em;white-space:nowrap}
+        .payment-table tbody tr:last-child td{border-bottom:none}
+        .payment-table tbody tr:hover{background:#f8fafc}
+        .payment-id,.payment-amount{color:#10223d;font-weight:700}
+        .payment-customer{font-weight:600;white-space:nowrap}
+        .payment-vehicle,.payment-service{color:#10223d;font-weight:750;white-space:nowrap}
+        .payment-method{display:inline-flex;align-items:center;padding:6px 9px;border-radius:7px;background:#f1f5f9;color:#334155;font-size:11px;font-weight:650;white-space:nowrap}
+        .payment-status{display:inline-block;padding:6px 10px;border-radius:6px;background:#f1f5f9;color:#475569;font-size:10px;font-weight:800;white-space:nowrap}
+        .payment-status-paid{background:#dcfce7;color:#15803d}
+        .payment-status-pending{background:#fef3c7;color:#92400e}
+        .payment-status-failed{background:#fee2e2;color:#b91c1c}
+        .payment-status-cancelled{background:#e2e8f0;color:#475569}
+        .payment-action-form{display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:145px}
+        .payment-method-select{width:100%;min-width:145px;padding:9px 8px;border:1px solid #dbe3ee;border-radius:7px;background:#fff;color:#0f172a;font-family:inherit;font-size:12px}
+        .payment-action-button{padding:9px 12px;border:0;border-radius:7px;background:#2563eb;color:#fff;font-family:inherit;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer}
+        .payment-action-button:hover{background:#1d4ed8}
+        .payment-cash-button{background:#15803d}
+        .payment-confirmed{color:#15803d;font-size:11px;font-weight:750;white-space:nowrap}
+        .payment-message{margin-bottom:16px;padding:13px 16px;border-radius:8px;font-size:13px}
+        .payment-message-success{border:1px solid #bbf7d0;background:#f0fdf4;color:#166534}
+        .payment-message-error{border:1px solid #fecaca;background:#fef2f2;color:#991b1b}
+        .payment-empty{display:none;padding:35px 15px;text-align:center;color:#64748b}
+        .payment-empty h3{margin:0 0 8px;color:#10223d}
+        .payment-empty p{margin:0;font-size:13px}
+        @media(max-width:800px){.payment-panel{padding:16px}.payment-summary{grid-template-columns:1fr}}
+        @media(max-width:480px){.payment-search-row{align-items:stretch;flex-direction:column}.payment-clear{width:100%}}
+    </style>
+</head>
+<body>
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="side-brand">
+            <img th:src="@{/images/autocare-logo.png}" alt="AutoCare Logo" onerror="this.style.display='none'">
+            <span class="brand-name">Auto<span class="brand-highlight">Care</span></span>
+        </div>
+        <a class="side-link" th:href="@{/admin/dashboard}">Dashboard</a>
+        <a class="side-link" th:href="@{/admin/service-requests}">Service Requests</a>
+        <a class="side-link" th:href="@{/admin/work-in-progress}">Work in Progress</a>
+        <a class="side-link" th:href="@{/admin/completed}">Completed</a>
+        <a class="side-link" th:href="@{/admin/customers}">Customers</a>
+        <a class="side-link" th:href="@{/admin/vehicles}">Vehicles</a>
+        <a class="side-link active" th:href="@{/admin/payments}">Payments</a>
+        <a class="side-link" th:href="@{/admin/reports}">Reports</a>
+        <a class="side-link" th:href="@{/}">Home</a>
+    </aside>
+
+    <main class="main">
+        <header class="page-head">
+            <strong>Payments</strong>
+            <span>Service Manager</span>
+        </header>
+
+        <div class="content payment-page">
+            <div th:if="${successMessage}" class="payment-message payment-message-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="payment-message payment-message-error" th:text="${errorMessage}"></div>
+
+            <section class="card panel">
+                <div class="payment-heading">
+                    <div>
+                        <h2>Payment Management</h2>
+                        <p>Review payment records for vehicle service bookings.</p>
+                    </div>
+                    <div class="payment-total"><strong th:text="${totalPayments}">0</strong> Payments</div>
+                </div>
+            </section>
+
+            <section class="card panel">
+                <h3>Payment Summary</h3>
+                <div class="payment-summary">
+                    <div class="payment-summary-item">
+                        <div class="payment-summary-label">Total Recorded Payments</div>
+                        <div class="payment-summary-value" th:text="${totalPayments}">0</div>
+                    </div>
+                    <div class="payment-summary-item">
+                        <div class="payment-summary-label">Total Recorded Amount</div>
+                        <div class="payment-summary-value" th:text="${'₹' + #numbers.formatDecimal(totalAmount, 1, 2)}">₹0.00</div>
+                    </div>
+                    <div class="payment-summary-item">
+                        <div class="payment-summary-label">Paid Amount</div>
+                        <div class="payment-summary-value" th:text="${'₹' + #numbers.formatDecimal(paidAmount, 1, 2)}">₹0.00</div>
+                    </div>
+                    <div class="payment-summary-item">
+                        <div class="payment-summary-label">Pending Amount</div>
+                        <div class="payment-summary-value" th:text="${'₹' + #numbers.formatDecimal(pendingAmount, 1, 2)}">₹0.00</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card payment-panel">
+                <div class="payment-panel-header">
+                    <h3>Payment Records (<span th:text="${totalPayments}">0</span>)</h3>
+                    <p>Search by payment ID, booking ID, customer, vehicle, service, amount, method or status.</p>
+                </div>
+
+                <div class="payment-search-row">
+                    <input type="search" id="paymentSearch" class="payment-search" placeholder="Search payments..." aria-label="Search payments">
+                    <button type="button" id="paymentClear" class="payment-clear">Clear</button>
+                </div>
+                <div class="payment-results" id="paymentResults" aria-live="polite">Showing payments</div>
+
+                <div class="payment-table-scroll" id="paymentTableScroll" th:if="${!#lists.isEmpty(payments)}">
+                    <table class="payment-table">
+                        <thead>
+                        <tr>
+                            <th>Payment ID</th><th>Booking ID</th><th>Customer</th><th>Vehicle</th>
+                            <th>Service</th><th>Amount</th><th>Method</th><th>Status</th>
+                            <th>Payment Date</th><th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="payment : ${payments}" class="payment-row"
+                            th:attr="data-search=${payment.id + ' ' + (payment.booking != null ? payment.booking.id : '') + ' ' + (payment.booking != null and payment.booking.customer != null ? payment.booking.customer.name : '') + ' ' + (payment.booking != null and payment.booking.vehicle != null ? payment.booking.vehicle.make + ' ' + payment.booking.vehicle.model : '') + ' ' + (payment.booking != null and payment.booking.service != null ? payment.booking.service.name : '') + ' ' + payment.amount + ' ' + (payment.method != null ? payment.method : '') + ' ' + (payment.status != null ? payment.status : '') + ' ' + (payment.paidAt != null ? payment.paidAt : '')}">
+                            <td class="payment-id" th:text="${payment.id}">1</td>
+                            <td th:text="${payment.booking != null ? payment.booking.id : 'N/A'}">1</td>
+                            <td class="payment-customer" th:text="${payment.booking != null and payment.booking.customer != null ? payment.booking.customer.name : 'Not available'}">Customer</td>
+                            <td class="payment-vehicle" th:text="${payment.booking != null and payment.booking.vehicle != null ? payment.booking.vehicle.make + ' ' + payment.booking.vehicle.model : 'Not available'}">Vehicle</td>
+                            <td class="payment-service" th:text="${payment.booking != null and payment.booking.service != null ? payment.booking.service.name : 'Not available'}">Service</td>
+                            <td class="payment-amount" th:text="${'₹' + #numbers.formatDecimal(payment.amount, 1, 2)}">₹0.00</td>
+                            <td><span class="payment-method" th:text="${payment.method != null and !#strings.isEmpty(payment.method) ? payment.method : 'Not selected'}">Not selected</span></td>
+                            <td>
+                                <span class="payment-status"
+                                      th:text="${payment.status != null ? payment.status : 'Pending'}"
+                                      th:classappend="${payment.status != null and payment.status.equalsIgnoreCase('Paid') ? ' payment-status-paid' : (payment.status != null and payment.status.equalsIgnoreCase('Pending') ? ' payment-status-pending' : (payment.status != null and payment.status.equalsIgnoreCase('Failed') ? ' payment-status-failed' : (payment.status != null and payment.status.equalsIgnoreCase('Cancelled') ? ' payment-status-cancelled' : '')))}">Pending</span>
+                            </td>
+                            <td th:text="${payment.paidAt != null ? #temporals.format(payment.paidAt, 'dd-MM-yyyy HH:mm') : 'Not available'}">Not available</td>
+                            <td>
+                                <form th:if="${payment.status == null or !payment.status.equalsIgnoreCase('Paid')}"
+                                      th:action="@{/admin/payments/{id}/update(id=${payment.id})}"
+                                      method="post" class="payment-action-form">
+                                    <select name="method" class="payment-method-select" required
+                                            aria-label="Select payment method" onchange="updatePaymentButton(this)">
+                                        <option value="" disabled th:selected="${payment.method == null or #strings.isEmpty(payment.method)}">Select Method</option>
+                                        <option value="Cash" th:selected="${payment.method == 'Cash'}">Cash</option>
+                                        <option value="Google Pay" th:selected="${payment.method == 'Google Pay'}">Google Pay</option>
+                                        <option value="PhonePe" th:selected="${payment.method == 'PhonePe'}">PhonePe</option>
+                                        <option value="Paytm" th:selected="${payment.method == 'Paytm'}">Paytm</option>
+                                        <option value="UPI" th:selected="${payment.method == 'UPI'}">UPI</option>
+                                        <option value="Debit Card" th:selected="${payment.method == 'Debit Card'}">Debit Card</option>
+                                        <option value="Credit Card" th:selected="${payment.method == 'Credit Card'}">Credit Card</option>
+                                    </select>
+                                   <input type="hidden" name="action" value="demo-payment">
+								   <button
+								       type="submit"
+								       class="payment-action-button"
+								       onclick="return preparePaymentAction(this.form)">
+								       Confirm Payment
+								   </button>
+                                </form>
+                                <span th:if="${payment.status != null and payment.status.equalsIgnoreCase('Paid')}" class="payment-confirmed">Confirmed</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="payment-empty" id="paymentNoResults">
+                    <h3>No Matching Payments</h3>
+                    <p>Try another payment ID, customer, vehicle, service or payment method.</p>
+                </div>
+
+                <div th:if="${#lists.isEmpty(payments)}" class="payment-empty" style="display:block">
+                    <h3>No Payment Records</h3>
+                    <p>Payment records will appear here when payments are created.</p>
+                    <a th:href="@{/admin/service-requests}" class="btn btn-light">View Service Requests</a>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    function updatePaymentButton(selectElement) {
+        const button = selectElement.form.querySelector("button[type='submit']");
+        button.textContent = selectElement.value === "Cash" ? "Confirm Cash" : "Confirm Payment";
+    }
+
+	function preparePaymentAction(form) {
+	    const method = form.querySelector('select[name="method"]').value;
+	    const actionInput = form.querySelector('input[name="action"]');
+
+	    if (!method) {
+	        alert("Please select a payment method.");
+	        return false;
+	    }
+
+	    if (method === "Cash") {
+	        actionInput.value = "confirm-cash";
+
+	        return confirm(
+	            "Confirm that cash has actually been collected?"
+	        );
+	    }
+
+	    actionInput.value = "demo-payment";
+
+	    return confirm(
+	        "Continue to the DEMO PAYMENT confirmation page for "
+	        + method + "?"
+	    );
+	}
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("paymentSearch");
+        const clearButton = document.getElementById("paymentClear");
+        const rows = Array.from(document.querySelectorAll(".payment-row"));
+        const resultsText = document.getElementById("paymentResults");
+        const noResults = document.getElementById("paymentNoResults");
+        const tableScroll = document.getElementById("paymentTableScroll");
+
+        document.querySelectorAll(".payment-method-select").forEach(updatePaymentButton);
+
+        function filterPayments() {
+            const query = searchInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+            rows.forEach(function (row) {
+                const matches = (row.dataset.search || "").toLowerCase().includes(query);
+                row.style.display = matches ? "" : "none";
+                if (matches) visibleCount++;
+            });
+            resultsText.textContent = "Showing " + visibleCount + " of " + rows.length + " payments";
+            noResults.style.display = rows.length > 0 && visibleCount === 0 ? "block" : "none";
+            if (tableScroll) tableScroll.style.display = rows.length > 0 && visibleCount > 0 ? "block" : "none";
+        }
+
+        searchInput.addEventListener("input", filterPayments);
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            filterPayments();
+            searchInput.focus();
+        });
+        filterPayments();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Demo Payment | AutoCare</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <style>
+        .demo-payment-container {
+            max-width: 650px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .demo-payment-card {
+            padding: 35px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+        }
+
+        .demo-badge {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 7px 12px;
+            border-radius: 6px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .demo-payment-card h2 {
+            margin: 0 0 10px;
+            color: #10223d;
+            font-size: 25px;
+        }
+
+        .demo-description {
+            margin-bottom: 25px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .demo-payment-details {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .demo-detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        .demo-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .demo-detail-label {
+            color: #64748b;
+        }
+
+        .demo-detail-value {
+            color: #10223d;
+            font-weight: 700;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .demo-amount {
+            color: #15803d;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .demo-warning {
+            margin-bottom: 24px;
+            padding: 14px;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            background: #fffbeb;
+            color: #92400e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .demo-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .demo-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 45px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 750;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .demo-success-button {
+            flex: 1;
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .demo-success-button:hover {
+            background: #1d4ed8;
+        }
+
+        .demo-cancel-button {
+            background: #edf2f8;
+            color: #334155;
+        }
+
+        .demo-cancel-button:hover {
+            background: #e2e8f0;
+        }
+
+        @media (max-width: 550px) {
+            .demo-payment-container {
+                margin: 20px auto;
+                padding: 12px;
+            }
+
+            .demo-payment-card {
+                padding: 22px;
+            }
+
+            .demo-actions {
+                flex-direction: column;
+            }
+
+            .demo-button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+
+        <div class="side-brand">
+            <img th:src="@{/images/autocare-logo.png}"
+                 alt="AutoCare Logo"
+                 onerror="this.style.display='none'">
+
+            <span class="brand-name">
+                Auto<span class="brand-highlight">Care</span>
+            </span>
+        </div>
+
+        <a class="side-link" th:href="@{/admin/dashboard}">
+            Dashboard
+        </a>
+
+        <a class="side-link" th:href="@{/admin/service-requests}">
+            Service Requests
+        </a>
+
+        <a class="side-link" th:href="@{/admin/work-in-progress}">
+            Work in Progress
+        </a>
+
+        <a class="side-link" th:href="@{/admin/completed}">
+            Completed
+        </a>
+
+        <a class="side-link" th:href="@{/admin/customers}">
+            Customers
+        </a>
+
+        <a class="side-link" th:href="@{/admin/vehicles}">
+            Vehicles
+        </a>
+
+        <a class="side-link active" th:href="@{/admin/payments}">
+            Payments
+        </a>
+
+        <a class="side-link" th:href="@{/admin/reports}">
+            Reports
+        </a>
+
+        <a class="side-link" th:href="@{/}">
+            Home
+        </a>
+
+    </aside>
+
+    <main class="main">
+
+        <header class="page-head">
+            <strong>Demo Payment</strong>
+            <span>AutoCare Administration</span>
+        </header>
+
+        <div class="content">
+
+            <div class="demo-payment-container">
+
+                <section class="demo-payment-card">
+
+                    <span class="demo-badge">
+                        DEMO PAYMENT ONLY
+                    </span>
+
+                    <h2>Confirm Demo Payment</h2>
+
+                    <p class="demo-description">
+                        Review the payment details below before completing
+                        the simulated transaction.
+                    </p>
+
+                    <div class="demo-payment-details">
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Payment ID
+                            </span>
+
+                            <span class="demo-detail-value"
+                                  th:text="${payment.id}">
+                                1
+                            </span>
+                        </div>
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Booking ID
+                            </span>
+
+                            <span class="demo-detail-value"
+                                  th:text="${payment.booking != null ? payment.booking.id : 'N/A'}">
+                                1
+                            </span>
+                        </div>
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Customer
+                            </span>
+
+                            <span class="demo-detail-value"
+                                  th:text="${payment.booking != null and payment.booking.customer != null ? payment.booking.customer.name : 'Not available'}">
+                                Customer
+                            </span>
+                        </div>
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Vehicle
+                            </span>
+
+                            <span class="demo-detail-value"
+                                  th:text="${payment.booking != null and payment.booking.vehicle != null ? payment.booking.vehicle.make + ' ' + payment.booking.vehicle.model : 'Not available'}">
+                                Vehicle
+                            </span>
+                        </div>
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Payment Method
+                            </span>
+
+                            <span class="demo-detail-value"
+                                  th:text="${payment.method}">
+                                Google Pay
+                            </span>
+                        </div>
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Payment Status
+                            </span>
+
+                            <span class="demo-detail-value">
+                                Pending
+                            </span>
+                        </div>
+
+                        <div class="demo-detail-row">
+                            <span class="demo-detail-label">
+                                Amount
+                            </span>
+
+                            <span class="demo-amount"
+                                  th:text="${'₹' + #numbers.formatDecimal(payment.amount, 1, 2)}">
+                                ₹0.00
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="demo-warning">
+                        This is a simulated payment for project demonstration.
+                        No real money will be transferred. Completing this
+                        demo will mark the selected payment as Paid in the
+                        application.
+                    </div>
+
+                    <div class="demo-actions">
+
+                        <form
+                            th:action="@{/admin/payments/{id}/demo-complete(id=${payment.id})}"
+                            method="post"
+                            style="flex: 1;">
+
+                            <button type="submit"
+                                    class="demo-button demo-success-button"
+                                    style="width: 100%;"
+                                    onclick="return confirm('Complete this simulated demo payment? No real money will be transferred.');">
+                                Complete Demo Payment
+                            </button>
+
+                        </form>
+
+                        <a th:href="@{/admin/payments}"
+                           class="demo-button demo-cancel-button">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
